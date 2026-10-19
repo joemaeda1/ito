@@ -146,9 +146,16 @@
     color:#2B2440;border-radius:14px;padding:14px 16px;margin-bottom:14px;text-align:center;
   }
   .topic-banner .ttext{font-size:18px;font-weight:900;}
-  .topic-banner .scale{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;color:#5a4413;font-weight:700;}
+  .topic-banner .scale-rows{display:flex;flex-direction:column;gap:6px;margin-top:12px;text-align:left;}
+  .topic-banner .scale-row{display:flex;align-items:baseline;gap:10px;color:#3d2f10;font-weight:700;font-size:16px;}
+  .topic-banner .scale-num{flex:0 0 auto;min-width:58px;font-family:var(--mono);font-weight:700;color:#2B2440;}
+  .topic-banner .scale-txt{flex:1;line-height:1.35;}
   .number-stage{text-align:center;padding:26px 0 10px;}
   .number-stage .lab{font-size:13px;color:var(--ink-soft);margin-bottom:6px;}
+  .number-btn{display:block;width:100%;font:inherit;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;padding:26px 0 18px;}
+  .number-btn:active{transform:scale(0.985);}
+  .number-hidden{color:var(--ink-soft);letter-spacing:6px;animation:none;opacity:0.55;}
+  .num-hint{margin-top:6px;font-size:13px;font-weight:700;color:var(--ink-soft);}
   .number-display{
     font-family:var(--mono);font-weight:700;font-size:64px;color:var(--ink);
     animation:popin 0.35s ease;
@@ -157,7 +164,8 @@
   .round-pill{display:inline-block;background:rgba(255,255,255,0.1);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--muted);margin-bottom:10px;}
   .history-dots{display:flex;gap:5px;margin-bottom:10px;}
   .history-dots span{width:9px;height:9px;border-radius:50%;display:inline-block;}
-  .order-anchor{display:flex;align-items:center;justify-content:space-between;padding:6px 22px 6px 34px;font-size:13px;font-weight:700;color:var(--muted);}
+  .order-anchor{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 22px 8px 34px;font-size:18px;font-weight:900;color:var(--white);}
+  .order-anchor .anchor-end{font-size:15px;font-weight:700;color:#cfcbe6;text-align:right;}
   .order-anchor-top{border-bottom:1px dashed rgba(255,255,255,0.08);margin-bottom:6px;padding-bottom:8px;}
   .order-anchor-bottom{border-top:1px dashed rgba(255,255,255,0.08);margin-top:-4px;padding-top:8px;margin-bottom:14px;}
   .thread-wrap{position:relative;padding-left:22px;margin-top:6px;}
@@ -323,7 +331,8 @@ const STRINGS = {
     localSetupSubtitle:"デバイスを順番に回して遊びます。",
     playerCountLabel:"人数", startLocalBtn:"はじめる",
     nextTurnLabel:"次の番", passInstructions:"画面をこの人に渡してください。準備ができたらタップ。",
-    revealNumberBtn:"自分の数字を見る", decideAndPassBtn:"決定して次の人へ渡す",
+    revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次の人へ渡す",
+    tapToReveal:"タップして表示", tapToHide:"タップして隠す",
     retopicHeading:"次のお題を決める", thisTopicStartBtn:"このお題で始める",
     bankHeading:"お題バンク",
     bankIntro:"みんなで作るお題集。気に入ったら、ゲーム中の「みんな」からも選べます。",
@@ -339,7 +348,7 @@ const STRINGS = {
       "A topic is revealed (e.g. “Spicy food”)",
       "Everyone gets a secret number from 1 to 100 (only you can see yours)",
       "Describe where your number falls on the topic using words, never the number itself",
-      "Talk it through as a group and arrange everyone from smallest to largest, using only the hints",
+      "Talk it through as a group and arrange everyone from lowest to highest, using only the hints",
       "Reveal! If the order matches the numbers, you win"
     ],
     btnOnline:"Online Play",
@@ -380,8 +389,8 @@ const STRINGS = {
     waitingOthersText:"Sent! Waiting for everyone else…",
     spectatorJoinedText:"This round already started. You'll be included starting next round!",
     spectatorWatchingText:"You're spectating this round. You'll join starting next round.",
-    orderInstructions:"Use the hints to arrange everyone from smallest (top) to largest (bottom). Then hit “Reveal”!",
-    orderLowLabel:"⬆ Smallest", orderHighLabel:"⬇ Largest",
+    orderInstructions:"Use the hints to arrange everyone from lowest (top) to highest (bottom). Then hit “Reveal”!",
+    orderLowLabel:"⬆ Lowest", orderHighLabel:"⬇ Highest",
     btnHelp:"❓ How to Play", helpHeading:"How to Play",
     pledgeAria:"Open ito's three pledges",
     judgeBtn:"Reveal", waitingHostJudgeText:"The host will reveal. Talk it through and arrange together.",
@@ -394,7 +403,8 @@ const STRINGS = {
     localSetupSubtitle:"Pass one device around.",
     playerCountLabel:"Number of players", startLocalBtn:"Start",
     nextTurnLabel:"Up next", passInstructions:"Hand the device to this person. Tap when ready.",
-    revealNumberBtn:"Reveal my number", decideAndPassBtn:"Confirm & pass to next player",
+    revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm & pass to next player",
+    tapToReveal:"Tap to reveal", tapToHide:"Tap to hide",
     retopicHeading:"Choose the next topic", thisTopicStartBtn:"Start with this topic",
     bankHeading:"Topic bank",
     bankIntro:"A topic collection built together. Pick these in-game under “Community.”",
@@ -1109,7 +1119,22 @@ function beginLocalRound(){
   local.order=shuffle(ids);
   playRoundStartSound();
 }
-function localRevealOwnNumber(){ local.phase='pass-show'; render(); }
+let localNumberShown=false;   // the number is hidden by default on each player's hint screen
+function localRevealOwnNumber(){ local.phase='pass-show'; localNumberShown=false; render(); }
+function numberBodyHTML(num, shown){
+  return shown
+    ? `<div class="number-display">${num}</div><div class="num-hint">${t('tapToHide')}</div>`
+    : `<div class="number-display number-hidden">•••</div><div class="num-hint">${t('tapToReveal')}</div>`;
+}
+// Toggles in place (no re-render) so whatever the player has typed in the hint box is kept.
+function toggleLocalNumber(){
+  const el=document.getElementById('num-card'); if(!el||!local) return;
+  const ids=Object.keys(local.players);
+  const p=local.players[ids[local.passIdx]]; if(!p) return;
+  localNumberShown=!localNumberShown;
+  el.setAttribute('aria-pressed', localNumberShown?'true':'false');
+  el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown);
+}
 function localSubmitClue(){
   const ids=Object.keys(local.players);
   const id=ids[local.passIdx];
@@ -1246,19 +1271,26 @@ function renderErrorBanner(){
   return `<div class="error">${esc(errorMsg)}</div>`;
 }
 
+function topicBannerHTML(topic){
+  return `<div class="topic-banner"><div class="ttext">${esc(topic.text)}</div>
+    <div class="scale-rows">
+      <div class="scale-row"><span class="scale-num">1 →</span><span class="scale-txt">${esc(topic.low)}</span></div>
+      <div class="scale-row"><span class="scale-num">100 →</span><span class="scale-txt">${esc(topic.high)}</span></div>
+    </div></div>`;
+}
+
 function renderOrderAndReveal(playersObj, order, topic, phase, round, history, hostAllowed, cb){
   let html='';
   html += renderHistoryDots(history);
   html += `<div class="round-pill">${roundLabel(round)}</div>`;
-  html += `<div class="topic-banner"><div class="ttext">${esc(topic.text)}</div>
-    <div class="scale"><span>${esc(topic.low)}</span><span>${esc(topic.high)}</span></div></div>`;
+  html += topicBannerHTML(topic);
   html += renderErrorBanner();
 
   if(phase==='order'){
     html += `<p class="subtitle">${t('orderInstructions')}</p>`;
     html += `<div class="order-anchor order-anchor-top">
       <span>${t('orderLowLabel')}</span>
-      <span style="opacity:0.5;font-size:11px;">${esc(topic.low)}</span>
+      <span class="anchor-end">${esc(topic.low)}</span>
     </div>`;
     html += `<div class="thread-wrap">`;
     order.forEach((id,idx)=>{
@@ -1277,7 +1309,7 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     html += `</div>`;
     html += `<div class="order-anchor order-anchor-bottom">
       <span>${t('orderHighLabel')}</span>
-      <span style="opacity:0.5;font-size:11px;">${esc(topic.high)}</span>
+      <span class="anchor-end">${esc(topic.high)}</span>
     </div>`;
     if(hostAllowed){
       html += `<button class="btn btn-primary" onclick="${cb.reveal}()">${t('judgeBtn')}</button>`;
@@ -1395,8 +1427,8 @@ function renderHelpMode(){
     {icon:'🎴', title:'A topic is revealed', body:'Everyone sees the same topic, like "Spicy food" or "Nerve-wracking situations."'},
     {icon:'🔢', title:'You get a secret number', body:'Each player gets a random number from 1 to 100. Only you can see yours.'},
     {icon:'💬', title:'Give a hint', body:'Describe where your number falls on the topic scale using words, never the number itself.'},
-    {icon:'🔀', title:'Arrange together', body:'Using only the hints, arrange everyone from smallest number (top) to largest (bottom).'},
-    {icon:'🧵', title:'Reveal!', body:'Flip the cards! If the numbers go smallest to largest top-to-bottom, the thread holds. You win!'},
+    {icon:'🔀', title:'Arrange together', body:'Using only the hints, arrange everyone from lowest number (top) to highest (bottom).'},
+    {icon:'🧵', title:'Reveal!', body:'Flip the cards! If the numbers go lowest to highest top-to-bottom, the thread holds. You win!'},
   ];
   const tipTitle = l==='ja' ? 'コツ' : 'Tips';
   const tips = l==='ja' ? [
@@ -1521,8 +1553,7 @@ function renderOnlineMode(){
     const amActive = activeIds.includes(myId);
     html += renderHistoryDots(room.history);
     html += `<div class="round-pill">${roundLabel(room.round)}</div>`;
-    html += `<div class="topic-banner"><div class="ttext">${esc(room.topic.text)}</div>
-      <div class="scale"><span>${esc(room.topic.low)}</span><span>${esc(room.topic.high)}</span></div></div>`;
+    html += topicBannerHTML(room.topic);
     if(!amActive){
       html += `<div class="card" style="text-align:center;padding:24px 18px;">
         <div style="font-size:32px;margin-bottom:10px;">👀</div>
@@ -1611,10 +1642,9 @@ function renderLocalMode(){
     const ids=Object.keys(local.players);
     const id=ids[local.passIdx];
     const p=local.players[id];
-    html += `<div class="topic-banner"><div class="ttext">${esc(local.topic.text)}</div>
-      <div class="scale"><span>${esc(local.topic.low)}</span><span>${esc(local.topic.high)}</span></div></div>`;
-    html += `<div class="card number-stage"><div class="lab">${numberOfLabel(esc(p.name))}</div>
-      <div class="number-display">${p.number}</div></div>`;
+    html += topicBannerHTML(local.topic);
+    html += `<button type="button" id="num-card" class="card number-stage number-btn" aria-pressed="${localNumberShown?'true':'false'}" onclick="toggleLocalNumber()"><div class="lab">${numberOfLabel(esc(p.name))}</div>
+      <div class="num-body">${numberBodyHTML(p.number, localNumberShown)}</div></button>`;
     html += `<div class="field"><label class="label">${t('clueLabel')}</label>
       <textarea id="lc-input" class="input" placeholder="${t('cluePlaceholder')}"></textarea></div>`;
     html += `<button class="btn btn-primary" onclick="localSubmitClue()">${t('decideAndPassBtn')}</button>`;
@@ -1647,7 +1677,7 @@ function renderLocalMode(){
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, toggleLocalNumber, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
