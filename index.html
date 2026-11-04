@@ -280,7 +280,7 @@
 /* ---------- firebase ---------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update, onValue, push } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+import { getDatabase, ref, get, set as fbSet, update as fbUpdate, onValue, push as fbPush } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPIT5N8g8w_V78UVp73B1JY5_dII3MRC0",
@@ -294,6 +294,16 @@ const firebaseConfig = {
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getDatabase(fbApp);
+// Firebase rejects the whole write if any value is undefined (it only accepts null). Strip them out
+// before every write so one missing field can never block a save.
+function stripUndefined(v){
+  if(Array.isArray(v)) return v.map(x=>x===undefined ? null : stripUndefined(x));
+  if(v && typeof v==='object'){ const o={}; for(const k of Object.keys(v)){ if(v[k]!==undefined) o[k]=stripUndefined(v[k]); } return o; }
+  return v;
+}
+const set=(r,v)=>fbSet(r,stripUndefined(v));
+const update=(r,v)=>fbUpdate(r,stripUndefined(v));
+const push=(r,v)=>fbPush(r,stripUndefined(v));
 function roomRef(code){ return ref(db, 'rooms/'+code); }
 function communityRef(l){ return ref(db, 'customTopics/'+l); }
 
@@ -551,88 +561,88 @@ const PRESET_TOPICS_JA = [
   {text:'洗濯物が乾きにくそうな天気', low:'よく乾く', high:'全然乾かない'},
 ];
 const PRESET_TOPICS_EN = [
-  {text:'Spicy food', low:'Not spicy', high:'Extremely spicy'},
-  {text:'Food you\'d love someone to treat you to', low:'Wouldn\'t want it', high:'Would love it'},
-  {text:'Late-night cravings', low:'Rarely crave it', high:'Always crave it'},
-  {text:'Lunchbox items that make your day', low:'Doesn\'t excite me', high:'Makes my day'},
-  {text:'Popular pizza toppings', low:'Not popular', high:'Very popular'},
-  {text:'How soft a food is', low:'Hard', high:'Very soft'},
-  {text:'What you actually want for breakfast', low:'Don\'t want it', high:'Really want it'},
-  {text:'How much you\'d regret a bad souvenir purchase', low:'No regret', high:'Huge regret'},
-  {text:'School cafeteria food everyone fought over', low:'Not popular', high:'Very popular'},
-  {text:'Surprisingly popular convenience store snacks', low:'Not surprising', high:'Very surprising'},
-  {text:'Sleepy animals', low:'Barely sleeps', high:'Sleeps constantly'},
-  {text:'Popular zoo animals', low:'Not popular', high:'Very popular'},
-  {text:'Creepy-looking animals', low:'Not creepy', high:'Very creepy'},
-  {text:'How popular each zoo animal is with kids', low:'Not popular', high:'Very popular'},
-  {text:'Animal abilities you\'d want for yourself', low:'Don\'t want it', high:'Really want it'},
-  {text:'Popularity of sea creatures at an aquarium', low:'Not popular', high:'Very popular'},
-  {text:'How glamorous a childhood dream job sounds', low:'Not glamorous', high:'Very glamorous'},
-  {text:'Adult superpowers that would quietly change your life', low:'Barely helps', high:'Changes everything'},
-  {text:'How convincingly a 5-year-old could pull this off', low:'Not convincing', high:'Very convincing'},
-  {text:'How hard an animal\'s life would be if you became one', low:'Easy life', high:'Very hard life'},
-  {text:'College skills or certifications actually worth having', low:'Not useful', high:'Very useful'},
-  {text:'Things about your parents you finally understand as an adult', low:'Still don\'t get it', high:'Totally get it'},
-  {text:'How much you miss home once you\'ve moved out', low:'Don\'t miss it', high:'Miss it a lot'},
-  {text:'How much trouble you\'d get in with your parents', low:'No trouble', high:'Big trouble'},
-  {text:'Nerve-wracking situations', low:'Not nervous', high:'Extremely nervous'},
-  {text:'How devastating it is to oversleep', low:'Not a big deal', high:'Devastating'},
-  {text:'Test questions that make you want to cry', low:'Easy', high:'Cry-level hard'},
-  {text:'How panicked you get before a deadline', low:'Not panicked', high:'Total panic'},
-  {text:'Things that sting to hear', low:'Doesn\'t sting', high:'Really hurts'},
-  {text:'How scary a ghost story is', low:'Not scary', high:'Very scary'},
-  {text:'How likely you are to cry at a wedding', low:'Won\'t cry', high:'Will sob'},
-  {text:'Things that get you scolded in class', low:'Never scolded', high:'Seriously scolded'},
-  {text:'Things you want to do the second you wake up', low:'Don\'t want to', high:'Want to right away'},
-  {text:'What you want to do when you\'re exhausted', low:'Don\'t want to', high:'Want to right now'},
-  {text:'How embarrassing something is', low:'Not embarrassing', high:'Mortifying'},
-  {text:'How awkward it is to receive a gift you don\'t want', low:'Not awkward', high:'Very awkward'},
-  {text:'How nostalgic something feels', low:'Not nostalgic', high:'Very nostalgic'},
-  {text:'Regrets that stick with you for life', low:'No regret', high:'Lifelong regret'},
-  {text:'Tall buildings', low:'Short', high:'Very tall'},
-  {text:'Places that are awkward to go alone', low:'Not awkward', high:'Very awkward'},
-  {text:'Cold places', low:'Warm', high:'Freezing'},
-  {text:'How rural a place feels', low:'Urban', high:'Very rural'},
-  {text:'Places that probably get snow', low:'Never snows', high:'Snows every year'},
-  {text:'Food you absolutely must have on a trip', low:'Skippable', high:'Must have'},
-  {text:'How much luggage you pack for a trip', low:'Very little', high:'A lot'},
-  {text:'Touristy destinations', low:'Not touristy', high:'Very touristy'},
-  {text:'Trips a college student would realistically dream of taking', low:'Not interested', high:'Dream trip'},
-  {text:'Places you go to often', low:'Rarely', high:'Very often'},
-  {text:'Expensive-looking things', low:'Cheap-looking', high:'Very pricey-looking'},
-  {text:'Heavy things', low:'Light', high:'Very heavy'},
-  {text:'Luxury items with prices you can\'t even guess', low:'Easy to guess', high:'Impossible to guess'},
-  {text:'A treat you\'d splurge on for under $10', low:'Not a treat', high:'Very indulgent'},
-  {text:'Things that make a room feel cozy', low:'Not cozy', high:'Very cozy'},
-  {text:'Strong smells', low:'No smell', high:'Very strong smell'},
-  {text:'Gadgets that would make you want to buy them immediately', low:'Don\'t want it', high:'Want it now'},
-  {text:'A childhood item you\'d want to keep forever', low:'Don\'t need it', high:'Must keep it'},
-  {text:'How much something blows up on social media', low:'Gets no buzz', high:'Goes viral'},
-  {text:'Posts that are likely to get a lot of likes', low:'Few likes', high:'Tons of likes'},
-  {text:'How good a movie is that you\'d recommend to a friend', low:'Wouldn\'t recommend', high:'Must recommend'},
-  {text:'Karaoke song energy', low:'Calm', high:'High energy'},
-  {text:'Game difficulty', low:'Easy', high:'Very hard'},
-  {text:'How trend-aware someone is', low:'Not trend-aware', high:'Very trend-aware'},
-  {text:'Hobbies or skills that sound impressive', low:'Not impressive', high:'Very impressive'},
-  {text:'Things that make people a little jealous if you own them', low:'Not enviable', high:'Very enviable'},
-  {text:'Hard school subjects', low:'Easy', high:'Very hard'},
-  {text:'How likely you are to fall asleep in class', low:'Stay awake', high:'Fall asleep fast'},
-  {text:'Qualities a good leader absolutely needs', low:'Not needed', high:'Absolutely needed'},
-  {text:'A coworker or classmate\'s small act that saves your day', low:'Not helpful', high:'Very helpful'},
-  {text:'How physically demanding a part-time job is', low:'Not demanding', high:'Very demanding'},
-  {text:'The most exciting part of a classic fairy tale', low:'Not exciting', high:'Most exciting'},
-  {text:'Inventions that would matter most to an astronaut', low:'Not important', high:'Essential'},
-  {text:'How flashy a power a fictional ruler might have', low:'Not flashy', high:'Very flashy'},
-  {text:'Things you\'d bring to a deserted island', low:'Don\'t need it', high:'Must bring'},
-  {text:'Something a time traveler might want to bring back from the past', low:'Don\'t want it', high:'Really want it'},
-  {text:'Spells you\'d want to try if magic were real', low:'Don\'t want to try', high:'Dying to try'},
-  {text:'Superpowers that would make people jealous', low:'Not enviable', high:'Very enviable'},
-  {text:'Dream jobs you\'d actually pursue as an adult', low:'Not interested', high:'Dream job'},
-  {text:'How convincing your reason would be for turning into an animal for a day', low:'Not convincing', high:'Very convincing'},
-  {text:'How bad you are at mornings', low:'Good at mornings', high:'Terrible at mornings'},
-  {text:'How fun a rainy day can be', low:'Not fun', high:'Very fun'},
-  {text:'What you crave right after waking up', low:'Don\'t crave it', high:'Crave it'},
-  {text:'Weather that makes laundry a nightmare to dry', low:'Dries fast', high:'Never dries'},
+  {text:'Foods, ranked by how spicy they are', low:'Not spicy', high:'Extremely spicy'},
+  {text:'Foods, ranked by how much you\'d love someone to treat you to them', low:'Wouldn\'t want it', high:'Would love it'},
+  {text:'Late-night snacks, ranked by how often you crave them', low:'Rarely crave it', high:'Always crave it'},
+  {text:'Lunchbox items, ranked by how happy they\'d make you', low:'Doesn\'t excite me', high:'Makes my day'},
+  {text:'Pizza toppings, ranked by how popular they are', low:'Not popular', high:'Very popular'},
+  {text:'Foods, ranked by how soft they are', low:'Hard', high:'Very soft'},
+  {text:'Breakfast foods, ranked by how much you\'d want them', low:'Don\'t want it', high:'Really want it'},
+  {text:'Souvenirs you could buy, ranked by how much you\'d regret buying them', low:'No regret', high:'Huge regret'},
+  {text:'School lunch items, ranked by how popular they were', low:'Not popular', high:'Very popular'},
+  {text:'Convenience store snacks, ranked by how surprisingly popular they are', low:'Not surprising', high:'Very surprising'},
+  {text:'Animals, ranked by how much they sleep', low:'Barely sleeps', high:'Sleeps constantly'},
+  {text:'Zoo animals, ranked by how popular they are', low:'Not popular', high:'Very popular'},
+  {text:'Animals, ranked by how creepy they look', low:'Not creepy', high:'Very creepy'},
+  {text:'Zoo animals, ranked by how much kids love them', low:'Not loved', high:'Loved by all kids'},
+  {text:'Animal abilities, ranked by how much you\'d want them', low:'Don\'t want it', high:'Really want it'},
+  {text:'Sea creatures at an aquarium, ranked by how popular they are', low:'Not popular', high:'Very popular'},
+  {text:'Jobs kids dream of, ranked by how glamorous they sound', low:'Not glamorous', high:'Very glamorous'},
+  {text:'Everyday superpowers, ranked by how much they\'d change your life', low:'Barely helps', high:'Changes everything'},
+  {text:'Roles a 5-year-old could play, ranked by how convincing they\'d be', low:'Not convincing', high:'Very convincing'},
+  {text:'Animals you could be reborn as, ranked by how hard their life would be', low:'Easy life', high:'Very hard life'},
+  {text:'College skills or certifications, ranked by how useful they are', low:'Not useful', high:'Very useful'},
+  {text:'Things your parents said, ranked by how much you understand them now', low:'Still don\'t get it', high:'Totally get it'},
+  {text:'Things from home, ranked by how much you miss them after moving out', low:'Don\'t miss it', high:'Miss it a lot'},
+  {text:'Things you could do as a kid, ranked by how much trouble you\'d get in', low:'No trouble', high:'Big trouble'},
+  {text:'Situations you could be in, ranked by how nervous they\'d make you', low:'Not nervous', high:'Extremely nervous'},
+  {text:'Things you could oversleep for, ranked by how devastating it would be', low:'Not a big deal', high:'Devastating'},
+  {text:'Test questions, ranked by how much they\'d make you want to cry', low:'Easy', high:'Cry-level hard'},
+  {text:'Deadlines, ranked by how much they\'d make you panic', low:'Not panicked', high:'Total panic'},
+  {text:'Things someone could say to you, ranked by how much they\'d sting', low:'Doesn\'t sting', high:'Really hurts'},
+  {text:'Ghost stories, ranked by how scary they are', low:'Not scary', high:'Very scary'},
+  {text:'Wedding moments, ranked by how likely they\'d make you cry', low:'Won\'t cry', high:'Will sob'},
+  {text:'Things you could do in class, ranked by how much you\'d get scolded', low:'Never scolded', high:'Seriously scolded'},
+  {text:'Things to do after waking up, ranked by how much you want to do them', low:'Don\'t want to', high:'Want to right away'},
+  {text:'Things to do when exhausted, ranked by how much you want to do them', low:'Don\'t want to', high:'Want to right now'},
+  {text:'Things that could happen to you, ranked by how embarrassing they\'d be', low:'Not embarrassing', high:'Mortifying'},
+  {text:'Gifts you could receive, ranked by how awkward they\'d make you feel', low:'Not awkward', high:'Very awkward'},
+  {text:'Things from your past, ranked by how nostalgic they make you feel', low:'Not nostalgic', high:'Very nostalgic'},
+  {text:'Choices you could make in life, ranked by how much you\'d regret them', low:'No regret', high:'Lifelong regret'},
+  {text:'Buildings, ranked by how tall they are', low:'Short', high:'Very tall'},
+  {text:'Places to go alone, ranked by how awkward it feels', low:'Not awkward', high:'Very awkward'},
+  {text:'Places in the world, ranked by how cold they are', low:'Warm', high:'Freezing'},
+  {text:'Places to live, ranked by how rural they feel', low:'Urban', high:'Very rural'},
+  {text:'Places in the world, ranked by how often it snows', low:'Never snows', high:'Snows every year'},
+  {text:'Foods to try on a trip, ranked by how much you must have them', low:'Skippable', high:'Must have'},
+  {text:'Trips you could take, ranked by how much luggage you\'d pack', low:'Very little', high:'A lot'},
+  {text:'Travel destinations, ranked by how touristy they are', low:'Not touristy', high:'Very touristy'},
+  {text:'Trips, ranked by how much a college student would dream of them', low:'Not interested', high:'Dream trip'},
+  {text:'Places you could go, ranked by how often you go there', low:'Rarely', high:'Very often'},
+  {text:'Things you could own, ranked by how expensive they look', low:'Cheap-looking', high:'Very pricey-looking'},
+  {text:'Things you could carry, ranked by how heavy they are', low:'Light', high:'Very heavy'},
+  {text:'Luxury items, ranked by how hard it is to guess their price', low:'Easy to guess', high:'Impossible to guess'},
+  {text:'Treats under $10, ranked by how indulgent they feel', low:'Not a treat', high:'Very indulgent'},
+  {text:'Things in a room, ranked by how cozy they make it feel', low:'Not cozy', high:'Very cozy'},
+  {text:'Things with a smell, ranked by how strong it is', low:'No smell', high:'Very strong smell'},
+  {text:'Gadgets, ranked by how badly you\'d want to buy them right now', low:'Don\'t want it', high:'Want it now'},
+  {text:'Childhood items, ranked by how much you\'d want to keep them forever', low:'Don\'t need it', high:'Must keep it'},
+  {text:'Things you could post online, ranked by how viral they\'d go', low:'Gets no buzz', high:'Goes viral'},
+  {text:'Social media posts, ranked by how many likes they\'d get', low:'Few likes', high:'Tons of likes'},
+  {text:'Movies, ranked by how much you\'d recommend them to a friend', low:'Wouldn\'t recommend', high:'Must recommend'},
+  {text:'Karaoke songs, ranked by how much energy they have', low:'Calm', high:'High energy'},
+  {text:'Games, ranked by how hard they are', low:'Easy', high:'Very hard'},
+  {text:'People you know, ranked by how trend-aware they are', low:'Not trend-aware', high:'Very trend-aware'},
+  {text:'Hobbies or skills, ranked by how impressive they sound', low:'Not impressive', high:'Very impressive'},
+  {text:'Things you could own, ranked by how jealous they\'d make people', low:'Not enviable', high:'Very enviable'},
+  {text:'School subjects, ranked by how hard they are', low:'Easy', high:'Very hard'},
+  {text:'Classes, ranked by how likely you are to fall asleep in them', low:'Stay awake', high:'Fall asleep fast'},
+  {text:'Leadership qualities, ranked by how much a leader needs them', low:'Not needed', high:'Absolutely needed'},
+  {text:'Things a coworker could do, ranked by how much it helps you', low:'Not helpful', high:'Very helpful'},
+  {text:'Part-time jobs, ranked by how physically demanding they are', low:'Not demanding', high:'Very demanding'},
+  {text:'Moments in a classic fairy tale, ranked by how exciting they are', low:'Not exciting', high:'Most exciting'},
+  {text:'Inventions, ranked by how important they\'d be to an astronaut', low:'Not important', high:'Essential'},
+  {text:'Powers a fictional ruler might have, ranked by how flashy they are', low:'Not flashy', high:'Very flashy'},
+  {text:'Things for a deserted island, ranked by how much you need them', low:'Don\'t need it', high:'Must bring'},
+  {text:'Past items, ranked by how much a time traveler would want them', low:'Don\'t want it', high:'Really want it'},
+  {text:'Spells, ranked by how much you\'d want to try them if magic were real', low:'Don\'t want to try', high:'Dying to try'},
+  {text:'Superpowers, ranked by how jealous they\'d make people', low:'Not enviable', high:'Very enviable'},
+  {text:'Jobs, ranked by how much you\'d want to pursue them as an adult', low:'Not interested', high:'Dream job'},
+  {text:'Reasons to be an animal for a day, ranked by how convincing they are', low:'Not convincing', high:'Very convincing'},
+  {text:'Things to do in the morning, ranked by how hard they are for you', low:'Easy for me', high:'Really hard for me'},
+  {text:'Ways to spend a rainy day, ranked by how fun they are', low:'Not fun', high:'Very fun'},
+  {text:'Foods for right after waking up, ranked by how much you crave them', low:'Don\'t crave it', high:'Crave it'},
+  {text:'Types of weather, ranked by how slowly laundry dries', low:'Dries fast', high:'Never dries'},
 ];
 function topicsFor(l){ return l==='en' ? PRESET_TOPICS_EN : PRESET_TOPICS_JA; }
 
@@ -649,14 +659,14 @@ const LOGO_SRC = "data:image/webp;base64,UklGRhqbAABXRUJQVlA4WAoAAAAQAAAAfwIA+wI
 const TOPIC_MAX = 50, END_MAX = 20;
 const CUSTOM_EXAMPLES = {
   en:[
-    ['Excuses for being late','Not believable','Very believable'],
-    ['Ways to survive a Monday','Not helpful','Very helpful'],
-    ['Pets with big personality','Low-key','Huge personality'],
-    ['Picnic effort level','Very little effort','Huge effort'],
-    ['Songs that get everyone singing','Nobody sings','Everybody sings'],
-    ['Mystery items in the fridge','Not suspicious','Very suspicious'],
-    ['Surprise party locations','Not surprising','Very surprising'],
-    ['How dramatic a sneeze is','Not dramatic','Very dramatic']
+    ['Excuses for being late, ranked by how believable','Not believable','Very believable'],
+    ['Ways to survive a Monday, ranked by how helpful','Not helpful','Very helpful'],
+    ['Pets, ranked by how big their personality is','Low-key','Huge personality'],
+    ['Picnics, ranked by how much effort they take','Very little effort','Huge effort'],
+    ['Songs, ranked by how much they get a crowd singing','Nobody sings','Everybody sings'],
+    ['Fridge items, ranked by how suspicious they look','Not suspicious','Very suspicious'],
+    ['Surprise party spots, ranked by how surprising','Not surprising','Very surprising'],
+    ['Sneezes, ranked by how dramatic they are','Not dramatic','Very dramatic']
   ],
   ja:[
     ['遅刻の言い訳','信じられない','完全に信じる'],
@@ -886,10 +896,18 @@ try{ const sm = localStorage.getItem('ito_music_enabled'); if(sm !== null) music
 let musicVolume = 50;   // 0 to 100, remembered between visits
 try{ const sv = parseInt(localStorage.getItem('ito_music_volume'), 10); if(sv >= 0 && sv <= 100) musicVolume = sv; }catch(e){}
 let musicUnlocked=false, musicPlaying=false, musicNodes=null, musicTimer=null, musicNextBar=0, musicBarIdx=0;
+// The music is a recorded loop ("Sunny Ukulele", 118 BPM, 16 bars). It is loaded once, on the first tap, and
+// repeated seamlessly between two exact bar lines. If the file can't be loaded (missing, offline, opened from a
+// local file), the game falls back to the built-in synthesized tune below, so there is always music.
+const MUSIC_FILE = 'ito-music.mp3?v=18';
+const MUSIC_LOOP_SEC = 32.542375;      // exactly 16 bars at 118 BPM
+const MUSIC_LOOP_START = 2.033898;     // one bar in, so the loop never touches the start of the file
+const MUSIC_FILE_MAX_GAIN = 0.65;      // loop file volume at slider 100 (the file is mastered much louder than the synth)
+let musicFileBuf=null, musicFileState='idle', musicFilePromise=null, musicSrc=null, musicMode='file';
 const MUSIC_BEAT = 60/104, MUSIC_BAR = MUSIC_BEAT*4, MUSIC_EIGHTH = MUSIC_BEAT/2, MUSIC_SWING = MUSIC_EIGHTH*0.14;
 const MUSIC_MAX_GAIN = 2.78;   // gain at volume 100 (volume 60 would be 1.0, the default of 50 is a bit under)
 const MUSIC_MIX = {mallet:0.10, bass:0.05, wood:0.04, shaker:0.035};   // relative loudness of each instrument
-function musicTargetGain(){ const v=musicVolume/100; return MUSIC_MAX_GAIN*v*v; }
+function musicTargetGain(){ const v=musicVolume/100; return (musicMode==='file' ? MUSIC_FILE_MAX_GAIN : MUSIC_MAX_GAIN)*v*v; }
 // 8-bar loop: C | Am | F | G | C | Em | F | G  (root note, third interval, marimba chord tones)
 const MUSIC_BARS = [
   {root:48, third:4, tones:[72,76,79,84]}, {root:45, third:3, tones:[69,72,76,81]},
@@ -973,26 +991,60 @@ function scheduleMusicBar(ctx,g,idx,t0){
   if(b%2===1) woodblock(ctx,g,at(7),0.5);
   for(let st=0;st<8;st++) shaker(ctx,g,at(st),st%2?1:0.55);
 }
-function startMusic(){
-  if(!musicEnabled || musicPlaying) return;
-  const ctx=ensureAudioCtx(); if(!ctx) return;
-  const g=ensureMusicGraph(ctx);
+function loadMusicFile(ctx){
+  if(musicFilePromise) return musicFilePromise;
+  musicFileState='loading';
+  musicFilePromise = fetch(MUSIC_FILE)
+    .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); })
+    .then(ab=>new Promise((res,rej)=>{ const p=ctx.decodeAudioData(ab,res,rej); if(p && p.then) p.then(res,rej); }))
+    .then(buf=>{ musicFileBuf=buf; musicFileState='ready'; })
+    .catch(e=>{ console.warn('Music file unavailable, using the built-in tune instead.', e); musicFileState='failed'; });
+  return musicFilePromise;
+}
+function fadeMusicIn(g,ctx){
   const now=ctx.currentTime;
   g.out.gain.cancelScheduledValues(now);
   g.out.gain.setValueAtTime(g.out.gain.value,now);
   g.out.gain.linearRampToValueAtTime(musicTargetGain(),now+1.5);
-  musicPlaying=true; musicBarIdx=0; musicNextBar=now+0.1;
+  return now;
+}
+function playMusicFile(ctx){
+  if(!musicPlaying || musicSrc || musicTimer) return;
+  musicMode='file';
+  const g=ensureMusicGraph(ctx);
+  const src=ctx.createBufferSource();
+  src.buffer=musicFileBuf; src.loop=true; src.loopStart=MUSIC_LOOP_START; src.loopEnd=MUSIC_LOOP_START+MUSIC_LOOP_SEC;
+  src.connect(g.out);
+  const now=fadeMusicIn(g,ctx);
+  src.start(now, MUSIC_LOOP_SEC);        // begin on bar 1 of the second repeat, then loop between the two bar lines
+  musicSrc=src;
+}
+function startSynthMusic(ctx){
+  if(!musicPlaying || musicSrc || musicTimer) return;
+  musicMode='synth';
+  const g=ensureMusicGraph(ctx);
+  const now=fadeMusicIn(g,ctx);
+  musicBarIdx=0; musicNextBar=now+0.1;
   const pump=()=>{ while(musicNextBar < ctx.currentTime+2.5){ scheduleMusicBar(ctx,g,musicBarIdx++,musicNextBar); musicNextBar+=MUSIC_BAR; } };
   pump(); musicTimer=setInterval(pump,500);
+}
+function startMusic(){
+  if(!musicEnabled || musicPlaying) return;
+  const ctx=ensureAudioCtx(); if(!ctx) return;
+  musicPlaying=true;                      // "wanted": also covers the moment while the file is still loading
+  const go=()=>{ if(musicFileState==='ready') playMusicFile(ctx); else startSynthMusic(ctx); };
+  if(musicFileState==='ready' || musicFileState==='failed') go();
+  else loadMusicFile(ctx).then(go);
 }
 function stopMusic(){
   if(!musicPlaying) return;
   musicPlaying=false; clearInterval(musicTimer); musicTimer=null;
-  if(!audioCtx || !musicNodes) return;
+  if(!audioCtx || !musicNodes){ musicSrc=null; return; }
   const t=audioCtx.currentTime, g=musicNodes;
   g.out.gain.cancelScheduledValues(t);
   g.out.gain.setValueAtTime(g.out.gain.value,t);
   g.out.gain.linearRampToValueAtTime(0,t+0.5);
+  if(musicSrc){ try{ musicSrc.stop(t+0.55); }catch(e){} musicSrc=null; }
   g.live.forEach(o=>{ try{ o.stop(t+0.55); }catch(e){} });
   g.live.clear();
 }
@@ -1289,6 +1341,7 @@ function hostStartRound(){
   const l=currentLang();
   const ids=Object.keys(room.players);
   if(ids.length<2){ errorMsg=t('err_needTwoPlayers'); syncError=false; render(); return; }
+  room.usedTopics = room.usedTopics || [];
   let topic=room.pendingTopic;
   if(room.topicMode==='presetRandom' || !topic){
     topic=pickRandomTopic(room.usedTopics, l);
