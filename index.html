@@ -110,10 +110,13 @@
   .input.mono{font-family:var(--mono);letter-spacing:2px;text-transform:uppercase;}
   textarea.input{resize:none;font-family:var(--hand);font-size:17px;min-height:54px;}
   .btn-home{padding:16px 18px;font-size:17px;border-radius:14px;}
-  .home-logo{display:flex;justify-content:center;width:100%;padding:clamp(8px,2vh,22px) 4px clamp(18px,3.5vh,34px);background:none;border:0;border-radius:18px;cursor:pointer;font:inherit;color:inherit;-webkit-appearance:none;appearance:none;}
-  .home-logo img{transition:transform .15s ease;}
-  .home-logo:active img{transform:scale(0.96);}
-  .home-logo img{height:clamp(190px,32vh,310px);width:auto;max-width:100%;object-fit:contain;display:block;filter:drop-shadow(0 14px 22px rgba(0,0,0,0.45));}
+  .home-logo{display:flex;justify-content:center;width:100%;padding:clamp(8px,2vh,22px) 4px clamp(18px,3.5vh,34px);background:none;border:0;border-radius:18px;cursor:pointer;font:inherit;color:inherit;-webkit-appearance:none;appearance:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+  .tilt-wrap{position:relative;display:block;transform-origin:50% 50%;will-change:transform;}
+  .home-logo:active .tilt-wrap{transform:scale(0.96);}
+  .tilt-wrap img{height:clamp(190px,32vh,310px);width:auto;max-width:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none;filter:drop-shadow(0 14px 22px rgba(0,0,0,0.45));}
+  .tilt-shine{position:absolute;inset:0;pointer-events:none;opacity:var(--shine,0);background:radial-gradient(circle at var(--mx,50%) var(--my,30%),rgba(255,255,255,0.34),rgba(255,255,255,0) 55%);mix-blend-mode:soft-light;-webkit-mask-image:var(--logo-mask);mask-image:var(--logo-mask);-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:48px;padding:10px 20px 10px 14px;margin:2px 0 14px;border:1.5px solid rgba(255,255,255,0.24);border-radius:14px;background:rgba(255,255,255,0.1);color:var(--white);font-family:var(--display);font-size:18px;font-weight:900;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .back-btn:active{transform:scale(0.97);}
   .home-main{display:flex;flex-direction:column;gap:16px;}
   .btn.home-big{flex-direction:column;gap:6px;min-height:clamp(100px,16vh,136px);font-size:clamp(22px,6.4vw,28px);border-radius:22px;}
   .home-big .home-ico{font-size:clamp(28px,7.5vw,36px);line-height:1;}
@@ -366,7 +369,7 @@ const STRINGS = {
     orderInstructions:"答えを見ながら、数字が小さい順(上→下)に並べ替えよう。並べ終わったら「判定する」!",
     orderLowLabel:"⬆ 小さい", orderHighLabel:"⬇ 大きい",
     btnHelp:"❓ 遊び方", helpHeading:"遊び方",
-    pledgeAria:"ito 3つの誓いを開く",
+    pledgeAria:"ito 3つの誓いを開く", backBtn:"もどる",
     judgeBtn:"数字をめくる", waitingHostJudgeText:"ホストがめくります。みんなで相談して並べてね。",
     revealNextBtn:"次をめくる", waitingRevealText:"ホストが数字をめくっています…",
     noClueText:"(答えなし)",
@@ -443,7 +446,7 @@ const STRINGS = {
     orderInstructions:"Use the responses to arrange everyone from lowest (top) to highest (bottom). Then hit “Reveal”!",
     orderLowLabel:"⬆ Lowest", orderHighLabel:"⬇ Highest",
     btnHelp:"❓ How to Play", helpHeading:"How to Play",
-    pledgeAria:"Open ito's three pledges",
+    pledgeAria:"Open ito's three pledges", backBtn:"Back",
     judgeBtn:"Reveal", waitingHostJudgeText:"The host will reveal. Talk it through and arrange together.",
     revealNextBtn:"Reveal next", waitingRevealText:"The host is revealing the numbers…",
     noClueText:"(no response)",
@@ -561,88 +564,88 @@ const PRESET_TOPICS_JA = [
   {text:'洗濯物が乾きにくそうな天気', low:'よく乾く', high:'全然乾かない'},
 ];
 const PRESET_TOPICS_EN = [
-  {text:'Foods, ranked by how spicy they are', low:'Not spicy', high:'Extremely spicy'},
-  {text:'Foods, ranked by how much you\'d love someone to treat you to them', low:'Wouldn\'t want it', high:'Would love it'},
-  {text:'Late-night snacks, ranked by how often you crave them', low:'Rarely crave it', high:'Always crave it'},
-  {text:'Lunchbox items, ranked by how happy they\'d make you', low:'Doesn\'t excite me', high:'Makes my day'},
-  {text:'Pizza toppings, ranked by how popular they are', low:'Not popular', high:'Very popular'},
-  {text:'Foods, ranked by how soft they are', low:'Hard', high:'Very soft'},
-  {text:'Breakfast foods, ranked by how much you\'d want them', low:'Don\'t want it', high:'Really want it'},
-  {text:'Souvenirs you could buy, ranked by how much you\'d regret buying them', low:'No regret', high:'Huge regret'},
-  {text:'School lunch items, ranked by how popular they were', low:'Not popular', high:'Very popular'},
-  {text:'Convenience store snacks, ranked by how surprisingly popular they are', low:'Not surprising', high:'Very surprising'},
-  {text:'Animals, ranked by how much they sleep', low:'Barely sleeps', high:'Sleeps constantly'},
-  {text:'Zoo animals, ranked by how popular they are', low:'Not popular', high:'Very popular'},
-  {text:'Animals, ranked by how creepy they look', low:'Not creepy', high:'Very creepy'},
-  {text:'Zoo animals, ranked by how much kids love them', low:'Not loved', high:'Loved by all kids'},
-  {text:'Animal abilities, ranked by how much you\'d want them', low:'Don\'t want it', high:'Really want it'},
-  {text:'Sea creatures at an aquarium, ranked by how popular they are', low:'Not popular', high:'Very popular'},
-  {text:'Jobs kids dream of, ranked by how glamorous they sound', low:'Not glamorous', high:'Very glamorous'},
-  {text:'Everyday superpowers, ranked by how much they\'d change your life', low:'Barely helps', high:'Changes everything'},
-  {text:'Roles a 5-year-old could play, ranked by how convincing they\'d be', low:'Not convincing', high:'Very convincing'},
-  {text:'Animals you could be reborn as, ranked by how hard their life would be', low:'Easy life', high:'Very hard life'},
-  {text:'College skills or certifications, ranked by how useful they are', low:'Not useful', high:'Very useful'},
-  {text:'Things your parents said, ranked by how much you understand them now', low:'Still don\'t get it', high:'Totally get it'},
-  {text:'Things from home, ranked by how much you miss them after moving out', low:'Don\'t miss it', high:'Miss it a lot'},
-  {text:'Things you could do as a kid, ranked by how much trouble you\'d get in', low:'No trouble', high:'Big trouble'},
-  {text:'Situations you could be in, ranked by how nervous they\'d make you', low:'Not nervous', high:'Extremely nervous'},
-  {text:'Things you could oversleep for, ranked by how devastating it would be', low:'Not a big deal', high:'Devastating'},
-  {text:'Test questions, ranked by how much they\'d make you want to cry', low:'Easy', high:'Cry-level hard'},
-  {text:'Deadlines, ranked by how much they\'d make you panic', low:'Not panicked', high:'Total panic'},
-  {text:'Things someone could say to you, ranked by how much they\'d sting', low:'Doesn\'t sting', high:'Really hurts'},
-  {text:'Ghost stories, ranked by how scary they are', low:'Not scary', high:'Very scary'},
-  {text:'Wedding moments, ranked by how likely they\'d make you cry', low:'Won\'t cry', high:'Will sob'},
-  {text:'Things you could do in class, ranked by how much you\'d get scolded', low:'Never scolded', high:'Seriously scolded'},
-  {text:'Things to do after waking up, ranked by how much you want to do them', low:'Don\'t want to', high:'Want to right away'},
-  {text:'Things to do when exhausted, ranked by how much you want to do them', low:'Don\'t want to', high:'Want to right now'},
-  {text:'Things that could happen to you, ranked by how embarrassing they\'d be', low:'Not embarrassing', high:'Mortifying'},
-  {text:'Gifts you could receive, ranked by how awkward they\'d make you feel', low:'Not awkward', high:'Very awkward'},
-  {text:'Things from your past, ranked by how nostalgic they make you feel', low:'Not nostalgic', high:'Very nostalgic'},
-  {text:'Choices you could make in life, ranked by how much you\'d regret them', low:'No regret', high:'Lifelong regret'},
-  {text:'Buildings, ranked by how tall they are', low:'Short', high:'Very tall'},
-  {text:'Places to go alone, ranked by how awkward it feels', low:'Not awkward', high:'Very awkward'},
-  {text:'Places in the world, ranked by how cold they are', low:'Warm', high:'Freezing'},
-  {text:'Places to live, ranked by how rural they feel', low:'Urban', high:'Very rural'},
-  {text:'Places in the world, ranked by how often it snows', low:'Never snows', high:'Snows every year'},
-  {text:'Foods to try on a trip, ranked by how much you must have them', low:'Skippable', high:'Must have'},
-  {text:'Trips you could take, ranked by how much luggage you\'d pack', low:'Very little', high:'A lot'},
-  {text:'Travel destinations, ranked by how touristy they are', low:'Not touristy', high:'Very touristy'},
-  {text:'Trips, ranked by how much a college student would dream of them', low:'Not interested', high:'Dream trip'},
-  {text:'Places you could go, ranked by how often you go there', low:'Rarely', high:'Very often'},
-  {text:'Things you could own, ranked by how expensive they look', low:'Cheap-looking', high:'Very pricey-looking'},
-  {text:'Things you could carry, ranked by how heavy they are', low:'Light', high:'Very heavy'},
-  {text:'Luxury items, ranked by how hard it is to guess their price', low:'Easy to guess', high:'Impossible to guess'},
-  {text:'Treats under $10, ranked by how indulgent they feel', low:'Not a treat', high:'Very indulgent'},
-  {text:'Things in a room, ranked by how cozy they make it feel', low:'Not cozy', high:'Very cozy'},
-  {text:'Things with a smell, ranked by how strong it is', low:'No smell', high:'Very strong smell'},
-  {text:'Gadgets, ranked by how badly you\'d want to buy them right now', low:'Don\'t want it', high:'Want it now'},
-  {text:'Childhood items, ranked by how much you\'d want to keep them forever', low:'Don\'t need it', high:'Must keep it'},
-  {text:'Things you could post online, ranked by how viral they\'d go', low:'Gets no buzz', high:'Goes viral'},
-  {text:'Social media posts, ranked by how many likes they\'d get', low:'Few likes', high:'Tons of likes'},
-  {text:'Movies, ranked by how much you\'d recommend them to a friend', low:'Wouldn\'t recommend', high:'Must recommend'},
-  {text:'Karaoke songs, ranked by how much energy they have', low:'Calm', high:'High energy'},
-  {text:'Games, ranked by how hard they are', low:'Easy', high:'Very hard'},
-  {text:'People you know, ranked by how trend-aware they are', low:'Not trend-aware', high:'Very trend-aware'},
-  {text:'Hobbies or skills, ranked by how impressive they sound', low:'Not impressive', high:'Very impressive'},
-  {text:'Things you could own, ranked by how jealous they\'d make people', low:'Not enviable', high:'Very enviable'},
-  {text:'School subjects, ranked by how hard they are', low:'Easy', high:'Very hard'},
-  {text:'Classes, ranked by how likely you are to fall asleep in them', low:'Stay awake', high:'Fall asleep fast'},
-  {text:'Leadership qualities, ranked by how much a leader needs them', low:'Not needed', high:'Absolutely needed'},
-  {text:'Things a coworker could do, ranked by how much it helps you', low:'Not helpful', high:'Very helpful'},
-  {text:'Part-time jobs, ranked by how physically demanding they are', low:'Not demanding', high:'Very demanding'},
-  {text:'Moments in a classic fairy tale, ranked by how exciting they are', low:'Not exciting', high:'Most exciting'},
-  {text:'Inventions, ranked by how important they\'d be to an astronaut', low:'Not important', high:'Essential'},
-  {text:'Powers a fictional ruler might have, ranked by how flashy they are', low:'Not flashy', high:'Very flashy'},
-  {text:'Things for a deserted island, ranked by how much you need them', low:'Don\'t need it', high:'Must bring'},
-  {text:'Past items, ranked by how much a time traveler would want them', low:'Don\'t want it', high:'Really want it'},
-  {text:'Spells, ranked by how much you\'d want to try them if magic were real', low:'Don\'t want to try', high:'Dying to try'},
-  {text:'Superpowers, ranked by how jealous they\'d make people', low:'Not enviable', high:'Very enviable'},
-  {text:'Jobs, ranked by how much you\'d want to pursue them as an adult', low:'Not interested', high:'Dream job'},
-  {text:'Reasons to be an animal for a day, ranked by how convincing they are', low:'Not convincing', high:'Very convincing'},
-  {text:'Things to do in the morning, ranked by how hard they are for you', low:'Easy for me', high:'Really hard for me'},
-  {text:'Ways to spend a rainy day, ranked by how fun they are', low:'Not fun', high:'Very fun'},
-  {text:'Foods for right after waking up, ranked by how much you crave them', low:'Don\'t crave it', high:'Crave it'},
-  {text:'Types of weather, ranked by how slowly laundry dries', low:'Dries fast', high:'Never dries'},
+  {text:'Spicy foods', low:'Mild enough for a toddler', high:'Tears and regret'},
+  {text:'Foods you\'d love to be treated to', low:'I\'d rather pay myself', high:'Take me there right now'},
+  {text:'Late-night snacks', low:'Wouldn\'t get up for it', high:'Worth a 2 a.m. fridge raid'},
+  {text:'Lunchbox surprises', low:'Lunch ruined', high:'Best day of the week'},
+  {text:'Pizza toppings', low:'Nobody orders it', high:'Always the first to go'},
+  {text:'Food textures', low:'Crunchy enough to wake the neighbors', high:'Soft as a cloud'},
+  {text:'Breakfast foods', low:'Only if I must', high:'Worth getting out of bed for'},
+  {text:'Souvenirs you could buy', low:'Cherished forever', high:'In a drawer by Tuesday'},
+  {text:'School lunch items', low:'Left on the tray', high:'Worth a fight for'},
+  {text:'Convenience store snacks', low:'Nobody\'s buying', high:'Secretly everyone\'s obsession'},
+  {text:'Sleepy animals', low:'Barely sleeps', high:'Sleeps 20 hours a day'},
+  {text:'Zoo animals', low:'Nobody stops to look', high:'Crowd gathers instantly'},
+  {text:'Creepy animals', low:'Adorable', high:'Haunts your dreams'},
+  {text:'Animals you\'d want to pet', low:'Nope, nope, nope', high:'Let me hug it forever'},
+  {text:'Animal superpowers', low:'I\'d pass', high:'I\'d trade my life for it'},
+  {text:'Aquarium creatures', low:'Skip this tank', high:'Star of the whole aquarium'},
+  {text:'Jobs kids dream of', low:'Sounds like homework', high:'Straight-up movie star'},
+  {text:'Small superpowers', low:'Party trick only', high:'Quietly changes your life'},
+  {text:'Roles a 5-year-old could play', low:'Everyone sees through it', high:'Completely believable'},
+  {text:'Animals you could be reborn as', low:'Total vacation', high:'Absolute nightmare'},
+  {text:'Skills worth learning in college', low:'Waste of a weekend', high:'Opens every door'},
+  {text:'Things your parents told you', low:'Total nonsense', high:'Painfully right'},
+  {text:'Things you miss from home', low:'Don\'t miss it at all', high:'Cry-level homesick'},
+  {text:'Mischief as a kid', low:'Parents just laughed', high:'Full name shouted'},
+  {text:'Nerve-wracking moments', low:'Totally calm', high:'Heart through the ceiling'},
+  {text:'Things you could oversleep for', low:'Free bonus nap', high:'Day completely ruined'},
+  {text:'Test questions', low:'Free points', high:'Cry in the exam hall'},
+  {text:'Deadlines', low:'Plenty of time', high:'Full panic mode'},
+  {text:'Things someone could say to you', low:'Water off a duck\'s back', high:'Replaying it for a week'},
+  {text:'Ghost stories', low:'Fall asleep mid-story', high:'Lights on all night'},
+  {text:'Wedding moments', low:'Dry-eyed', high:'Ugly crying in row three'},
+  {text:'Things you could do in class', low:'Teacher doesn\'t notice', high:'Straight to the principal'},
+  {text:'Things to do after waking up', low:'Not before coffee', high:'Immediately, no hesitation'},
+  {text:'Things to do when exhausted', low:'Zero interest', high:'Collapse into it right now'},
+  {text:'Things that could happen to you', low:'Not even embarrassing', high:'Move to another country'},
+  {text:'Gifts you could receive', low:'Genuinely delighted', high:'Fake smile, instant regift'},
+  {text:'Things from your childhood', low:'Don\'t remember it', high:'One whiff and you\'re 8 again'},
+  {text:'Life choices', low:'Zero regrets', high:'Haunts you for years'},
+  {text:'Buildings', low:'One-story shed', high:'Touching the clouds'},
+  {text:'Places to go alone', low:'Perfectly peaceful', high:'Everyone thinks you got stood up'},
+  {text:'Cold places', low:'T-shirt weather', high:'Eyelashes freeze'},
+  {text:'Places to live', low:'Rush hour at 3 a.m.', high:'More cows than people'},
+  {text:'Snowy places', low:'Never seen a snowflake', high:'Snow until May'},
+  {text:'Foods to try on a trip', low:'Skip it', high:'Fly back just for this'},
+  {text:'Trips you could take', low:'Tiny backpack', high:'Three suitcases and a cooler'},
+  {text:'Tourist destinations', low:'Hidden local secret', high:'Selfie sticks everywhere'},
+  {text:'Dream student trips', low:'Meh, I\'ll stay home', high:'Bucket list, selling my laptop'},
+  {text:'Places you go all the time', low:'Once a decade', high:'Basically your second home'},
+  {text:'Expensive-looking things', low:'Looks like a bargain bin', high:'Looks like it needs insurance'},
+  {text:'Heavy things', low:'Floats away', high:'Need a friend to lift it'},
+  {text:'Luxury items', low:'Easy to guess the price', high:'No idea, could be a car'},
+  {text:'Treats under $10', low:'Barely a treat', high:'Feels like a luxury hotel'},
+  {text:'Things in a room', low:'Cold and bare', high:'Blanket, tea, rain outside'},
+  {text:'Smells', low:'Can\'t smell a thing', high:'Fills the whole house'},
+  {text:'Gadgets', low:'Hard pass', high:'Take my money now'},
+  {text:'Childhood treasures', low:'Gladly donated', high:'Never getting rid of it'},
+  {text:'Things to post online', low:'Total silence', high:'Goes viral overnight'},
+  {text:'Group chat messages', low:'Left on read', high:'Everyone replies at once'},
+  {text:'Movies', low:'Fine, I guess', high:'Must watch tonight'},
+  {text:'Karaoke songs', low:'Sit-down ballad', high:'Everyone on the tables'},
+  {text:'Video games', low:'Relaxed and easy', high:'Controller-throwing hard'},
+  {text:'People you know', low:'Still using last year\'s slang', high:'Knew it before it was cool'},
+  {text:'Hobbies or skills', low:'Nobody asks about it', high:'Instant party legend'},
+  {text:'Things to own', low:'Nobody would care', high:'Everyone would be jealous'},
+  {text:'School subjects', low:'Easy A', high:'Brain melts'},
+  {text:'Classes', low:'Wide awake', high:'Out cold in five minutes'},
+  {text:'Leadership qualities', low:'Nice bonus', high:'Can\'t lead without it'},
+  {text:'Things a coworker could do', low:'Barely noticed', high:'Hero of your whole week'},
+  {text:'Part-time jobs', low:'Chill shift', high:'Leaves you wrecked'},
+  {text:'Fairy tale moments', low:'The slow part', high:'Edge of your seat'},
+  {text:'Astronaut inventions', low:'Nice to have', high:'Can\'t leave Earth without it'},
+  {text:'Powers a ruler might have', low:'Quiet and subtle', high:'Fireworks and trumpets'},
+  {text:'Things for a deserted island', low:'Dead weight', high:'Survival depends on it'},
+  {text:'Souvenirs from the past', low:'Not worth the trip', high:'Worth breaking time itself'},
+  {text:'Spells', low:'Meh, no thanks', high:'Casting it tonight'},
+  {text:'Superpowers', low:'Embarrassing power', high:'Absolutely broken power'},
+  {text:'Dream jobs', low:'Pays the bills, boring', high:'Would do it for free'},
+  {text:'Reasons to become an animal for a day', low:'Weak excuse', high:'Totally persuasive'},
+  {text:'Things to do in the morning', low:'Easy for me', high:'Defeated before 8 a.m.'},
+  {text:'Ways to spend a rainy day', low:'Boring', high:'Best day in'},
+  {text:'Foods right after waking up', low:'Nothing, thanks', high:'Starving the second I wake'},
+  {text:'Types of weather', low:'Dry in an hour', high:'Still damp next week'},
 ];
 function topicsFor(l){ return l==='en' ? PRESET_TOPICS_EN : PRESET_TOPICS_JA; }
 
@@ -659,14 +662,14 @@ const LOGO_SRC = "data:image/webp;base64,UklGRhqbAABXRUJQVlA4WAoAAAAQAAAAfwIA+wI
 const TOPIC_MAX = 50, END_MAX = 20;
 const CUSTOM_EXAMPLES = {
   en:[
-    ['Excuses for being late, ranked by how believable','Not believable','Very believable'],
-    ['Ways to survive a Monday, ranked by how helpful','Not helpful','Very helpful'],
-    ['Pets, ranked by how big their personality is','Low-key','Huge personality'],
-    ['Picnics, ranked by how much effort they take','Very little effort','Huge effort'],
-    ['Songs, ranked by how much they get a crowd singing','Nobody sings','Everybody sings'],
-    ['Fridge items, ranked by how suspicious they look','Not suspicious','Very suspicious'],
-    ['Surprise party spots, ranked by how surprising','Not surprising','Very surprising'],
-    ['Sneezes, ranked by how dramatic they are','Not dramatic','Very dramatic']
+    ['Excuses for being late','Totally believable','Aliens abducted me'],
+    ['Hobbies or skills','Nobody asks about it','Instant party legend'],
+    ['Surprise party spots','Calm and tidy','Total chaos'],
+    ['Pets','Low-key','Runs the household'],
+    ['Picnics','Sad crackers','Hired a caterer'],
+    ['Songs','Nobody sings','Everybody screaming'],
+    ['Fridge leftovers','Looks fine','Science experiment'],
+    ['Sneezes','Tiny squeak','Sets off car alarms']
   ],
   ja:[
     ['遅刻の言い訳','信じられない','完全に信じる'],
@@ -923,6 +926,10 @@ function midiHz(m){ return 440*Math.pow(2,(m-69)/12); }
 function ensureMusicGraph(ctx){
   if(musicNodes) return musicNodes;
   const out=ctx.createGain(); out.gain.value=0;
+  // the recorded loop passes through a "mood" stage: a volume and a low-pass filter that follow the game phase
+  const moodGain=ctx.createGain(); moodGain.gain.value=1;
+  const moodLP=ctx.createBiquadFilter(); moodLP.type='lowpass'; moodLP.frequency.value=18000; moodLP.Q.value=0.5;
+  moodLP.connect(moodGain); moodGain.connect(out);
   // melody bus: soft low-pass plus a tempo-synced echo
   const mel=ctx.createGain(); const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=4200; lp.Q.value=0.5;
   const delay=ctx.createDelay(1.0); delay.delayTime.value=MUSIC_BEAT*0.75;
@@ -941,7 +948,7 @@ function ensureMusicGraph(ctx){
   const sr=ctx.sampleRate||44100, len=Math.floor(sr*0.25);
   const noise=ctx.createBuffer(1,len,sr), d=noise.getChannelData(0);
   for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
-  musicNodes={out,mel,bass,perc,noise,live:new Set()};
+  musicNodes={out,mel,bass,perc,noise,moodGain,moodLP,live:new Set()};
   return musicNodes;
 }
 function trackVoice(g,node){ g.live.add(node); node.onended=()=>{ g.live.delete(node); }; }
@@ -991,6 +998,46 @@ function scheduleMusicBar(ctx,g,idx,t0){
   if(b%2===1) woodblock(ctx,g,at(7),0.5);
   for(let st=0;st<8;st++) shaker(ctx,g,at(st),st%2?1:0.55);
 }
+// How the music feels in each part of a round: [volume, brightness]. Quiet and soft while people think and talk,
+// opening up for the reveal, with a bright lift on a win and a softer landing when the thread snaps.
+const MUSIC_MOODS = {lobby:[1,18000], think:[0.6,2800], order:[0.5,2400], reveal:[0.85,9000], win:[1,18000], lose:[0.65,2600]};
+let musicMood='lobby', musicGuestMuted=false;
+function moodNow(){
+  const done=(n,rev,res)=> revealedCount(rev,n)>=n && res;
+  if(mode==='online' && onlineStep==='room' && room){
+    const p=room.phase; if(p==='clue') return 'think'; if(p==='order') return 'order';
+    if(p==='reveal') return done((room.order||[]).length,room.revealed,room.lastResult) ? (room.lastResult.success?'win':'lose') : 'reveal';
+    return 'lobby';
+  }
+  if(mode==='local' && localStep==='playing' && local){
+    const p=local.phase; if(p==='pass'||p==='pass-show') return 'think'; if(p==='order') return 'order';
+    if(p==='reveal') return done((local.order||[]).length,local.revealed,local.lastResult) ? (local.lastResult.success?'win':'lose') : 'reveal';
+    return 'lobby';
+  }
+  return 'lobby';
+}
+function applyMood(instant){
+  if(!musicNodes || !audioCtx) return;
+  const [gv,fv]=MUSIC_MOODS[musicMood]||MUSIC_MOODS.lobby, t=audioCtx.currentTime;
+  [[musicNodes.moodGain.gain,gv],[musicNodes.moodLP.frequency,fv]].forEach(([prm,v])=>{
+    prm.cancelScheduledValues(t);
+    if(instant) prm.setValueAtTime(v,t); else { prm.setValueAtTime(prm.value,t); prm.setTargetAtTime(v,t,0.45); }
+  });
+}
+function updateMusicMood(){
+  const m=moodNow(); if(m===musicMood) return;
+  musicMood=m; if(musicPlaying && musicMode==='file') applyMood(false);
+}
+// Online guests start with the music off, because every phone would play its own out-of-sync copy.
+// This is for the session only: their saved choice is untouched and comes back when they leave the room.
+function savedMusicPref(){ try{ return localStorage.getItem('ito_music_enabled')!=='0'; }catch(e){ return true; } }
+function muteMusicForGuest(){ if(!musicEnabled) return; musicGuestMuted=true; musicEnabled=false; stopMusic(); refreshTopbarButtons(); }
+function restoreMusicAfterRoom(){
+  if(!musicGuestMuted) return;
+  musicGuestMuted=false; musicEnabled=savedMusicPref();
+  if(musicEnabled && musicUnlocked) startMusic();
+  refreshTopbarButtons();
+}
 function loadMusicFile(ctx){
   if(musicFilePromise) return musicFilePromise;
   musicFileState='loading';
@@ -1014,7 +1061,8 @@ function playMusicFile(ctx){
   const g=ensureMusicGraph(ctx);
   const src=ctx.createBufferSource();
   src.buffer=musicFileBuf; src.loop=true; src.loopStart=MUSIC_LOOP_START; src.loopEnd=MUSIC_LOOP_START+MUSIC_LOOP_SEC;
-  src.connect(g.out);
+  src.connect(g.moodLP);
+  applyMood(true);
   const now=fadeMusicIn(g,ctx);
   src.start(now, MUSIC_LOOP_SEC);        // begin on bar 1 of the second repeat, then loop between the two bar lines
   musicSrc=src;
@@ -1054,6 +1102,7 @@ function applyMusicVolume(){
   g.cancelScheduledValues(t); g.setValueAtTime(g.value,t); g.setTargetAtTime(musicTargetGain(),t,0.05);
 }
 function toggleMusic(){
+  musicGuestMuted=false;
   musicEnabled=!musicEnabled;
   try{ localStorage.setItem('ito_music_enabled', musicEnabled ? '1' : '0'); }catch(e){}
   musicUnlocked=true;
@@ -1066,6 +1115,7 @@ function setMusicVolume(v){
   try{ localStorage.setItem('ito_music_volume', String(musicVolume)); }catch(e){}
   const num=document.getElementById('mp-vol-num'); if(num) num.textContent=String(musicVolume);
   if(musicVolume>0 && !musicEnabled){
+    musicGuestMuted=false;
     musicEnabled=true; musicUnlocked=true;
     try{ localStorage.setItem('ito_music_enabled','1'); }catch(e){}
     startMusic(); refreshTopbarButtons();
@@ -1227,6 +1277,7 @@ function goBank(){
 function goTitle(){
   detachRoomListener(); detachBankListener();
   mode=null; onlineStep='home'; room=null; local=null; errorMsg=''; syncError=false;
+  restoreMusicAfterRoom();
   render();
 }
 function inActiveGame(){
@@ -1250,7 +1301,7 @@ function confirmLeave(){ closeLeaveConfirm(); goTitle(); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeLeaveConfirm(); closeMusicPanel(); } });
 function goHelp(){ mode='help'; render(); }
 function goPledge(){ mode='pledge'; render(); }
-function goOnlineHome(){ mode='online'; onlineStep='home'; errorMsg=''; syncError=false; render(); }
+function goOnlineHome(){ mode='online'; onlineStep='home'; errorMsg=''; syncError=false; restoreMusicAfterRoom(); render(); }
 function goLocalSetup(){ mode='local'; localStep='setup'; errorMsg=''; render(); }
 function toggleHelp(){ showHelp=!showHelp; render(); }
 
@@ -1297,7 +1348,7 @@ async function joinRoomAction(){
   myName=name;
   r.players = r.players || {};
   r.players[myId] = {name, number:null, clue:'', submitted:false, joinedAt:Date.now()};
-  room=r; onlineStep='room'; render();
+  room=r; onlineStep='room'; muteMusicForGuest(); render();
   attachRoomListener(codeRaw);
   await safeWrite(()=>update(roomRef(codeRaw), {['players/'+myId]: r.players[myId]}));
   busy=false; render();
@@ -1719,6 +1770,7 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
 function render(){
   const app=document.getElementById('app');
   snapshotInputs();
+  syncHistory();
   document.documentElement.lang = currentLang();
   if(authError){ app.innerHTML=renderAuthErrorScreen(); return; }
   if(!authReady){ app.innerHTML=renderAuthLoading(); return; }
@@ -1730,6 +1782,8 @@ function render(){
   else if(mode==='help') html=renderHelpMode();
   else if(mode==='pledge') html=renderPledgeMode();
   app.innerHTML = html;
+  tiltReset();
+  updateMusicMood();
 }
 function renderAuthLoading(){
   return `${topbarHTML(false)}
@@ -1747,7 +1801,7 @@ function renderTitleScreen(){
     <button class="${lang==='ja'?'active':''}" onclick="setLang('ja')">日本語</button>
     <button class="${lang==='en'?'active':''}" onclick="setLang('en')">English</button>
   </div>`;
-  html += `<button class="home-logo" onclick="goPledge()" aria-label="${esc(t('pledgeAria'))}"><img src="${LOGO_SRC}" alt="ito"></button>`;
+  html += `<button class="home-logo" onclick="logoTap()" aria-label="${esc(t('pledgeAria'))}"><span class="tilt-wrap"><img src="${LOGO_SRC}" alt="ito"><span class="tilt-shine"></span></span></button>`;
   if(errorMsg) html += `<div class="error">${esc(errorMsg)}</div>`;
   html += `<div class="home-main">
     <button class="btn btn-primary home-big" onclick="goOnlineHome()"><span class="home-ico">📱</span><span>${t('btnOnline')}</span></button>
@@ -1784,7 +1838,7 @@ function oathCardHTML(l, big){
 
 function renderPledgeMode(){
   const l=currentLang();
-  return `${topbarHTML(true)}<div class="pledge-wrap">${oathCardHTML(l, true)}</div>`;
+  return `${topbarHTML(true)}<button class="back-btn" onclick="goBackPage()"><span aria-hidden="true">←</span> ${esc(t('backBtn'))}</button><div class="pledge-wrap">${oathCardHTML(l, true)}</div>`;
 }
 
 function renderHelpMode(){
@@ -2045,12 +2099,101 @@ function renderLocalMode(){
   return html;
 }
 
+/* ---------- the box on the home screen leans toward your pointer ---------- */
+const TILT_MAX = 10;   // degrees
+const tilt = {x:0,y:0,tx:0,ty:0,s:1,ts:1,sh:0,tsh:0,mx:50,my:30,raf:0,last:0,pressed:false,moved:0,startX:0,startY:0};
+let logoDragged = false;
+function reduceMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function tiltTarget(cx,cy){
+  const el=document.querySelector('.home-logo img'); if(!el) return false;
+  const r=el.getBoundingClientRect(); if(!r.width || !r.height) return false;
+  const nx=((cx-r.left)/r.width-0.5)*2, ny=((cy-r.top)/r.height-0.5)*2, cl=v=>Math.max(-1,Math.min(1,v));
+  tilt.tx=cl(nx); tilt.ty=cl(ny); tilt.mx=(cx-r.left)/r.width*100; tilt.my=(cy-r.top)/r.height*100;
+  return Math.abs(nx)<=1 && Math.abs(ny)<=1;      // true while the pointer is over the box
+}
+function tiltRest(){ tilt.tx=0; tilt.ty=0; tilt.ts=1; tilt.tsh=0; }
+function tiltReset(){ if(tilt.raf){ cancelAnimationFrame(tilt.raf); tilt.raf=0; } tilt.x=tilt.y=tilt.tx=tilt.ty=0; tilt.s=tilt.ts=1; tilt.sh=tilt.tsh=0; tilt.pressed=false; }
+function startTiltLoop(){ if(!tilt.raf){ tilt.last=performance.now(); tilt.raf=requestAnimationFrame(tiltFrame); } }
+function tiltFrame(now){
+  tilt.raf=0;
+  const dt=Math.min(0.05,((now-tilt.last)/1000)||0.016); tilt.last=now;
+  const rest=(tilt.tx===0 && tilt.ty===0 && tilt.ts===1), k=1-Math.exp(-dt/(rest?0.14:0.09));   // follow quickly, settle back a little slower
+  tilt.x+=(tilt.tx-tilt.x)*k; tilt.y+=(tilt.ty-tilt.y)*k; tilt.s+=(tilt.ts-tilt.s)*k; tilt.sh+=(tilt.tsh-tilt.sh)*k;
+  const wrap=document.querySelector('.tilt-wrap'); if(!wrap) return;
+  const settled=Math.abs(tilt.x-tilt.tx)<0.002 && Math.abs(tilt.y-tilt.ty)<0.002 && Math.abs(tilt.s-tilt.ts)<0.0005 && Math.abs(tilt.sh-tilt.tsh)<0.004;
+  const img=wrap.querySelector('img');
+  if(settled && rest){ wrap.style.transform=''; wrap.style.setProperty('--shine','0'); if(img) img.style.filter=''; return; }
+  wrap.style.transform=`perspective(900px) rotateX(${(-tilt.y*TILT_MAX).toFixed(2)}deg) rotateY(${(tilt.x*TILT_MAX).toFixed(2)}deg) scale(${tilt.s.toFixed(4)})`;
+  wrap.style.setProperty('--mx',tilt.mx.toFixed(1)+'%'); wrap.style.setProperty('--my',tilt.my.toFixed(1)+'%'); wrap.style.setProperty('--shine',tilt.sh.toFixed(3));
+  if(img) img.style.filter=`drop-shadow(${(-tilt.x*16).toFixed(1)}px ${(14-tilt.y*10).toFixed(1)}px 22px rgba(0,0,0,0.45))`;   // the shadow slides the opposite way
+  if(!settled) tilt.raf=requestAnimationFrame(tiltFrame);
+}
+function logoTap(){ if(logoDragged){ logoDragged=false; return; } goPledge(); }
+document.addEventListener('pointermove',(e)=>{
+  if(reduceMotion() || !document.querySelector('.home-logo')) return;
+  if(e.pointerType==='touch' && !tilt.pressed) return;            // touch only tilts while a finger is down
+  const over=tiltTarget(e.clientX,e.clientY);
+  if(tilt.pressed){ tilt.moved=Math.max(tilt.moved,Math.hypot(e.clientX-tilt.startX,e.clientY-tilt.startY)); tilt.ts=0.96; tilt.tsh=0.9; }
+  else if(over){ tilt.ts=1.04; tilt.tsh=0.9; }
+  else tiltRest();
+  startTiltLoop();
+});
+document.addEventListener('pointerdown',(e)=>{
+  logoDragged=false;
+  if(reduceMotion() || !(e.target.closest && e.target.closest('.home-logo'))) return;
+  tilt.pressed=true; tilt.moved=0; tilt.startX=e.clientX; tilt.startY=e.clientY;
+  tiltTarget(e.clientX,e.clientY); tilt.ts=0.96; tilt.tsh=0.9; startTiltLoop();
+});
+document.addEventListener('pointerup',(e)=>{
+  if(!tilt.pressed) return;
+  tilt.pressed=false; logoDragged = tilt.moved>14;                 // a drag across the box is not a tap
+  if(logoDragged || e.pointerType==='touch' || !tiltTarget(e.clientX,e.clientY)) tiltRest(); else { tilt.ts=1.04; tilt.tsh=0.9; }
+  startTiltLoop();
+});
+document.addEventListener('pointercancel',()=>{ if(tilt.pressed){ tilt.pressed=false; tiltRest(); startTiltLoop(); } });
+document.documentElement.addEventListener('mouseleave',()=>{ tiltRest(); startTiltLoop(); });
+document.documentElement.style.setProperty('--logo-mask','url("'+LOGO_SRC+'")');   // lets the shine follow the box's outline
+
+/* ---------- browser back/forward stays inside the game ---------- */
+let lastPageKey=null, navIdx=0, navSuppress=false;
+function pageKey(){
+  if(mode===null) return 'title';
+  if(mode==='online') return (onlineStep==='room' && room) ? 'online-room' : 'online-home';
+  if(mode==='local') return (localStep==='playing' && local) ? 'local-play' : 'local-setup';
+  return mode;   // help, bank, pledge
+}
+function syncHistory(){
+  const key=pageKey(); if(key===lastPageKey) return;
+  const first=(lastPageKey===null); lastPageKey=key;
+  try{
+    if(first || navSuppress) history.replaceState({ito:1,key,idx:navIdx},'');
+    else { navIdx++; history.pushState({ito:1,key,idx:navIdx},''); }
+  }catch(e){}
+}
+function goToPage(key){
+  if(key==='online-home'){ detachRoomListener(); room=null; goOnlineHome(); }
+  else if(key==='local-setup') goLocalSetup();
+  else if(key==='help') goHelp(); else if(key==='bank') goBank(); else if(key==='pledge') goPledge();
+  else goTitle();   // the title, or an old entry whose game no longer exists
+}
+window.addEventListener('popstate',(e)=>{
+  if(inActiveGame()){      // never lose a game to a stray back swipe: stay where you are and ask first
+    try{ navIdx++; history.pushState({ito:1,key:pageKey(),idx:navIdx},''); }catch(err){}
+    showLeaveConfirm(); return;
+  }
+  closeLeaveConfirm(); closeMusicPanel();
+  const st=e.state; if(st && st.ito) navIdx=st.idx;
+  navSuppress=true;
+  try{ goToPage(st && st.ito ? st.key : 'title'); } finally { navSuppress=false; }
+});
+function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) history.back(); else goTitle(); }
+
 /* ---------- expose handlers for inline HTML event attributes ----------
    (top-level functions in a module script are NOT auto-attached to window,
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, toggleLocalNumber, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
