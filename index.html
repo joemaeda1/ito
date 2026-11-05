@@ -518,6 +518,28 @@
   @keyframes glowPulse{0%,100%{box-shadow:0 0 12px rgba(242,199,75,.5);}50%{box-shadow:0 0 22px rgba(242,199,75,.85);}}
   @keyframes spark{0%{translate:0 0;opacity:0;scale:.5;}12%{opacity:1;scale:1;}100%{translate:var(--dx,26px) var(--dy,-24px);opacity:0;scale:.4;}}
   @media (prefers-reduced-motion:reduce){ .number-display{animation:none;} }
+
+  /* v23: header language switch, roomier home, back pills, the box comes alive */
+  .lang-mini{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--hair);margin-right:2px;}
+  .lang-mini button{min-width:44px;height:38px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:rgba(255,250,242,.7);font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.06em;cursor:pointer;}
+  .lang-mini button.active{background:var(--white);color:#2B2440;}
+  .home-logo{padding:clamp(6px,1.6vh,16px) 4px clamp(26px,4.6vh,46px);}
+  .home-main{margin-top:clamp(4px,1vh,10px);}
+  .back-below{align-self:center;margin:14px auto 4px;display:flex;}
+  .join-head{margin-bottom:10px;}
+  .box-idle,.box-spin{display:block;position:relative;transform-style:preserve-3d;}
+  .box-idle{perspective:1000px;}
+  .box-spin .tilt-wrap{transform-style:preserve-3d;}
+  .box-spin img{backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+  .box-back{position:absolute;left:31%;right:31%;top:10%;bottom:9%;border-radius:6px;background:linear-gradient(160deg,#323d4a,#232c37);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 14px 22px rgba(0,0,0,.4);transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;pointer-events:none;}
+  .box-back span{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vh,46px);color:var(--white);letter-spacing:.02em;}
+  @media (prefers-reduced-motion:no-preference){
+    .box-idle{animation:boxSway 6.4s ease-in-out infinite;}
+    .box-spin{animation:boxNudge 9s ease-in-out 3s infinite;}
+    .home-logo.live .box-idle,.home-logo.live .box-spin,.box-spin.spinning{animation-play-state:paused;}
+  }
+  @keyframes boxSway{0%,100%{transform:translateY(0) rotate(-1.2deg);}50%{transform:translateY(-6px) rotate(1.2deg);}}
+  @keyframes boxNudge{0%,88%,100%{transform:rotateY(0) rotate(0);}91%{transform:rotateY(-14deg) rotate(-2deg);}94%{transform:rotateY(10deg) rotate(1.5deg);}97%{transform:rotateY(-4deg) rotate(0);}}
 </style>
 </head>
 <body>
@@ -1037,13 +1059,18 @@ function waitThreadHTML(activeIds, players, code, round){
   return h+'</div>';
 }
 
-function topbarHTML(showHome){
+function backBelowHTML(){ return `<button class="back-btn back-below" onclick="goBackPage()">${icon('chev-left')}<span>${esc(t('backBtn'))}</span></button>`; }
+function langMiniHTML(){
+  return `<div class="lang-mini" role="group" aria-label="Language / 言語">
+    <button class="${lang==='ja'?'active':''}" lang="ja" aria-pressed="${lang==='ja'}" aria-label="日本語" onclick="setLang('ja')">JA</button><button class="${lang==='en'?'active':''}" lang="en" aria-pressed="${lang==='en'}" aria-label="English" onclick="setLang('en')">EN</button></div>`;
+}
+function topbarHTML(showHome, withLang){
   const soundLabel = soundEnabled ? t('soundOnLabel') : t('soundOffLabel');
   const musicLabel = musicEnabled ? t('musicOnLabel') : t('musicOffLabel');
   const soundBtn = `<button class="linkbtn icon-btn snd-btn" onclick="toggleSound()" aria-label="${esc(soundLabel)}" title="${esc(soundLabel)}">${icon(soundEnabled?'sound-on':'sound-off')}</button>`;
   const musicBtn = `<button class="linkbtn icon-btn mus-btn${musicEnabled?'':' off'}" onclick="toggleMusicPanel()" aria-label="${esc(musicLabel)}" title="${esc(musicLabel)}">${icon('music')}</button>`;
   const homeBtn = showHome ? `<button class="linkbtn home-btn" onclick="requestHome()">${t('homeLink')}</button>` : '';
-  return `<div class="topbar"><button class="brand brand-btn" onclick="requestHome()" aria-label="${esc(t('homeLink'))}">ito</button><div class="topbar-right">${homeBtn}${musicBtn}${soundBtn}</div></div>`;
+  return `<div class="topbar"><button class="brand brand-btn" onclick="requestHome()" aria-label="${esc(t('homeLink'))}">ito</button><div class="topbar-right">${withLang?langMiniHTML():''}${homeBtn}${musicBtn}${soundBtn}</div></div>`;
 }
 // Updates the sound/music buttons in place (no re-render, so a half-typed hint is never wiped).
 function refreshTopbarButtons(){
@@ -1095,8 +1122,23 @@ function snapshotInputs(){
     const sh=document.getElementById(px+'-share'); if(sh) d.share=sh.checked;
   });
   for(let i=0;i<8;i++){ const el=document.getElementById('ln-'+i); if(el) localNames[i]=el.value; }
-  ['cr-name','jr-name','jr-code'].forEach(id=>{ const el=document.getElementById(id); if(el) typedFields[id]=el.value; });
+  ['on-name','jr-code'].forEach(id=>{ const el=document.getElementById(id); if(el) typedFields[id]=el.value; });
+  const ci=document.getElementById('clue-input'); if(ci) clueDraft.online={key:onlineClueKey(), text:ci.value};
+  const li=document.getElementById('lc-input'); if(li) clueDraft.local={key:localClueKey(), text:li.value};
 }
+// A typed response survives redraws (the keyboard closing triggers one) but only for the same round, phase and player.
+const clueDraft = {online:null, local:null};
+function onlineClueKey(){ return room ? [room.code,room.round,room.phase,myId].join(':') : ''; }
+function localClueKey(){ return local ? [local.round,local.phase,local.passIdx].join(':') : ''; }
+function restoreClueDrafts(){
+  const ci=document.getElementById('clue-input'), d=clueDraft.online;
+  if(ci && d && d.key===onlineClueKey()) ci.value=d.text;
+  const li=document.getElementById('lc-input'), e=clueDraft.local;
+  if(li && e && e.key===localClueKey()) li.value=e.text;
+}
+function clearClueDrafts(){ clueDraft.online=null; clueDraft.local=null; }
+function savedName(){ try{ return localStorage.getItem('ito_name')||''; }catch(e){ return ''; } }
+function rememberName(n){ try{ localStorage.setItem('ito_name', n); }catch(e){} }
 
 function currentLang(){
   if(mode==='online' && room && room.lang) return room.lang;
@@ -1476,6 +1518,14 @@ let roomUnsub=null;
 let lastKnownRoomPhase=null;
 let lastKnownRevealed=null;
 
+// While someone types their response, keep the beads and the count live without touching the text box.
+function patchCluePeers(){
+  if(!room || room.phase!=='clue' || mode!=='online') return;
+  const wt=document.querySelector('.wait-thread'), cnt=document.getElementById('sub-count'); if(!wt) return;
+  const ids=room.order||[], n=ids.filter(id=>room.players[id] && room.players[id].submitted).length;
+  wt.outerHTML=waitThreadHTML(ids, room.players, room.code, room.round);
+  if(cnt) cnt.textContent=submittedCountText(n, ids.length);
+}
 function isTyping(){const a=document.activeElement;return a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA');}
 document.addEventListener('focusout', ()=>{ if(pendingRender){ pendingRender=false; render(); } });
 
@@ -1506,7 +1556,7 @@ function attachRoomListener(code){
       }
     }
     room = val;
-    if(isTyping()) pendingRender=true; else render();
+    if(isTyping()){ pendingRender=true; patchCluePeers(); } else render();
   }, (err)=>{
     console.error(err);
     syncError = true;
@@ -1596,7 +1646,7 @@ function goBank(){
 /* ---------- navigation ---------- */
 function goTitle(){
   detachRoomListener(); detachBankListener();
-  mode=null; onlineStep='home'; room=null; local=null; errorMsg=''; syncError=false;
+  mode=null; onlineStep='home'; room=null; local=null; errorMsg=''; syncError=false; clearClueDrafts();
   restoreMusicAfterRoom();
   render();
 }
@@ -1630,7 +1680,8 @@ async function createRoomAction(){
   if(busy) return;
   ensureAudioCtx();
   busy=true; errorMsg=''; syncError=false; render();
-  const name=(document.getElementById('cr-name').value||'').trim().slice(0,12) || (lang==='en' ? 'Player 1' : 'プレイヤー1');
+  const typed=(document.getElementById('on-name').value||'').trim().slice(0,12); if(typed) rememberName(typed);
+  const name=typed || (lang==='en' ? 'Player 1' : 'プレイヤー1');
   myName=name;
   let code='', tries=0, taken=true;
   try{
@@ -1655,7 +1706,8 @@ async function joinRoomAction(){
   if(busy) return;
   ensureAudioCtx();
   const codeRaw=(document.getElementById('jr-code').value||'').trim().toUpperCase();
-  const name=(document.getElementById('jr-name').value||'').trim().slice(0,12) || (lang==='en'?'Guest':'ゲスト');
+  const typed=(document.getElementById('on-name').value||'').trim().slice(0,12); if(typed) rememberName(typed);
+  const name=typed || (lang==='en'?'Guest':'ゲスト');
   if(!codeRaw){ errorMsg=t('err_codeRequired'); syncError=false; render(); return; }
   busy=true; errorMsg=''; syncError=false; render();
   let snap=null;
@@ -1742,6 +1794,7 @@ function submitClueAction(){
   const text=(document.getElementById('clue-input').value||'').trim();
   room.players[myId].clue=text;
   room.players[myId].submitted=true;
+  clueDraft.online=null; onlineNumberShown=false;   // auto-hide the number once the response is sent
   const activeIds = room.order || [];
   const all = activeIds.length>0 && activeIds.every(id=>room.players[id] && room.players[id].submitted);
   const updates={};
@@ -1854,11 +1907,20 @@ function toggleLocalNumber(){
   el.setAttribute('aria-pressed', localNumberShown?'true':'false');
   el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown);
 }
+// Online answer screen: tap the card to hide or show your number, in place so typed text stays.
+let onlineNumberShown=true, onlineNumberKey='';
+function toggleOnlineNumber(){
+  const el=document.getElementById('on-num-card'); if(!el||!room||!room.players[myId]) return;
+  onlineNumberShown=!onlineNumberShown;
+  el.setAttribute('aria-pressed', onlineNumberShown?'true':'false');   // same as Local: pressed = shown
+  el.querySelector('.num-body').innerHTML=numberBodyHTML(room.players[myId].number, onlineNumberShown);
+}
 function localSubmitClue(){
   const ids=Object.keys(local.players);
   const id=ids[local.passIdx];
   const text=(document.getElementById('lc-input').value||'').trim();
   local.players[id].clue=text;
+  clueDraft.local=null;
   local.passIdx++;
   local.phase = (local.passIdx>=ids.length) ? 'order' : 'pass';
   render();
@@ -2113,6 +2175,7 @@ function render(){
   else if(mode==='help') html=renderHelpMode();
   else if(mode==='pledge') html=renderPledgeMode();
   app.innerHTML = html;
+  restoreClueDrafts();
   tiltReset();
   updateMusicMood();
 }
@@ -2127,12 +2190,8 @@ function renderAuthErrorScreen(){
 }
 
 function renderTitleScreen(){
-  let html = `${topbarHTML(false)}`;
-  html += `<div class="lang-row">
-    <button class="${lang==='ja'?'active':''}" onclick="setLang('ja')">日本語</button>
-    <button class="${lang==='en'?'active':''}" onclick="setLang('en')">English</button>
-  </div>`;
-  html += `<button class="home-logo" onclick="logoTap()" aria-label="${esc(t('pledgeAria'))}"><span class="tilt-wrap"><img src="${LOGO_SRC}" alt="ito"><span class="tilt-shine"></span></span></button>`;
+  let html = `${topbarHTML(false, true)}`;
+  html += `<button class="home-logo" onclick="logoTap()" aria-label="${esc(t('pledgeAria'))}"><span class="box-idle"><span class="box-spin"><span class="tilt-wrap"><img src="${LOGO_SRC}" alt="ito"><span class="tilt-shine"></span><span class="box-back" aria-hidden="true"><span>ito</span></span></span></span></span></button>`;
   if(errorMsg) html += `<div class="error">${esc(errorMsg)}</div>`;
   html += `<div class="home-main">
     <button class="mode-card online" onclick="goOnlineHome()"><span class="mode-ico">${icon('phone')}</span><span class="mode-text"><span class="mode-title">${t('btnOnline')}</span><span class="mode-desc">${t('onlineHomeSubtitle')}</span></span><span class="mode-chev">${icon('chev-right')}</span></button>
@@ -2265,15 +2324,17 @@ function renderOnlineMode(){
     html += `<h2>${t('onlineHomeHeading')}</h2>`;
     html += `<p class="subtitle">${t('onlineHomeSubtitle')}</p>`;
     html += renderErrorBanner();
+    if(typedFields['on-name']===undefined) typedFields['on-name']=savedName();
     html += `<div class="card">
-      <div class="field"><label class="label">${t('yourNameLabel')}</label><input id="cr-name" class="input" maxlength="12" placeholder="${t('namePlaceholderHost')}" value="${esc(typedFields['cr-name']||'')}" ${busy?'disabled':''}></div>
+      <div class="field"><label class="label" for="on-name">${t('yourNameLabel')}</label><input id="on-name" class="input" maxlength="12" autocomplete="nickname" placeholder="${t('namePlaceholderHost')}" value="${esc(typedFields['on-name']||'')}" ${busy?'disabled':''}></div>
       <button class="btn btn-primary" onclick="createRoomAction()" ${busy?'disabled':''}>${busy?t('creatingBtn'):t('createRoomBtn')}</button>
     </div>
     <div class="card">
-      <div class="field"><label class="label">${t('roomCodeLabel')}</label><input id="jr-code" class="input mono" maxlength="4" placeholder="${t('codePlaceholder')}" value="${esc(typedFields['jr-code']||'')}" ${busy?'disabled':''}></div>
-      <div class="field"><label class="label">${t('yourNameLabel')}</label><input id="jr-name" class="input" maxlength="12" placeholder="${t('namePlaceholderGuest')}" value="${esc(typedFields['jr-name']||'')}" ${busy?'disabled':''}></div>
+      <div class="label join-head">${t('joinRoomBtn')}</div>
+      <div class="field"><label class="label" for="jr-code">${t('roomCodeLabel')}</label><input id="jr-code" class="input mono" maxlength="4" placeholder="${t('codePlaceholder')}" value="${esc(typedFields['jr-code']||'')}" ${busy?'disabled':''}></div>
       <button class="btn btn-secondary" onclick="joinRoomAction()" ${busy?'disabled':''}>${busy?t('joiningBtn'):t('joinRoomBtn')}</button>
-    </div>`;
+    </div>
+    ${backBelowHTML()}`;
     return html;
   }
 
@@ -2319,8 +2380,9 @@ function renderOnlineMode(){
       </div>`;
       return html;
     }
-    html += `<div class="card number-stage"><div class="lab">${t('yourNumberLabel')}</div>
-      <div class="number-display">${me.number}</div></div>`;
+    const nk=room.code+':'+room.round; if(onlineNumberKey!==nk){ onlineNumberKey=nk; onlineNumberShown=true; }
+    html += `<button type="button" id="on-num-card" class="card number-stage number-btn" aria-pressed="${onlineNumberShown?'true':'false'}" onclick="toggleOnlineNumber()"><div class="lab">${t('yourNumberLabel')}</div>
+      <div class="num-body">${numberBodyHTML(me.number, onlineNumberShown)}</div></button>`;
     html += renderErrorBanner();
     if(!me.submitted){
       html += `<div class="field"><label class="label">${t('clueLabel')}</label>
@@ -2331,7 +2393,7 @@ function renderOnlineMode(){
     }
     const submittedCount = activeIds.filter(id=>room.players[id] && room.players[id].submitted).length;
     html += waitThreadHTML(activeIds, room.players, room.code, room.round);
-    html += `<div class="helper" style="text-align:center;">${submittedCountText(submittedCount, activeIds.length)}</div>`;
+    html += `<div class="helper" id="sub-count" style="text-align:center;">${submittedCountText(submittedCount, activeIds.length)}</div>`;
     return html;
   }
 
@@ -2379,6 +2441,7 @@ function renderLocalMode(){
     html += `</div>`;
     html += renderErrorBanner();
     if(!setupCustom) html += `<button class="btn btn-primary" onclick="startLocalGame()">${t('startLocalBtn')}</button>`;
+    html += backBelowHTML();
     return html;
   }
 
@@ -2434,7 +2497,7 @@ function renderLocalMode(){
 }
 
 /* ---------- the box on the home screen leans toward your pointer ---------- */
-const TILT_MAX = 10;   // degrees
+const TILT_MAX = 14;   // degrees
 const tilt = {x:0,y:0,tx:0,ty:0,s:1,ts:1,sh:0,tsh:0,mx:50,my:30,raf:0,last:0,pressed:false,moved:0,startX:0,startY:0};
 let logoDragged = false;
 function reduceMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
@@ -2456,13 +2519,25 @@ function tiltFrame(now){
   const wrap=document.querySelector('.tilt-wrap'); if(!wrap) return;
   const settled=Math.abs(tilt.x-tilt.tx)<0.002 && Math.abs(tilt.y-tilt.ty)<0.002 && Math.abs(tilt.s-tilt.ts)<0.0005 && Math.abs(tilt.sh-tilt.tsh)<0.004;
   const img=wrap.querySelector('img');
+  const hl=document.querySelector('.home-logo'); if(hl) hl.classList.toggle('live', !(settled && rest));
   if(settled && rest){ wrap.style.transform=''; wrap.style.setProperty('--shine','0'); if(img) img.style.filter=''; return; }
   wrap.style.transform=`perspective(900px) rotateX(${(-tilt.y*TILT_MAX).toFixed(2)}deg) rotateY(${(tilt.x*TILT_MAX).toFixed(2)}deg) scale(${tilt.s.toFixed(4)})`;
   wrap.style.setProperty('--mx',tilt.mx.toFixed(1)+'%'); wrap.style.setProperty('--my',tilt.my.toFixed(1)+'%'); wrap.style.setProperty('--shine',tilt.sh.toFixed(3));
   if(img) img.style.filter=`drop-shadow(${(-tilt.x*16).toFixed(1)}px ${(14-tilt.y*10).toFixed(1)}px 22px rgba(0,0,0,0.45))`;   // the shadow slides the opposite way
   if(!settled) tilt.raf=requestAnimationFrame(tiltFrame);
 }
-function logoTap(){ if(logoDragged){ logoDragged=false; return; } goPledge(); }
+// Tap: a quick full turn (the back is a plain navy face with our wordmark), then the pledges open.
+let boxSpinning=false;
+function logoTap(){
+  if(logoDragged){ logoDragged=false; return; }
+  const sp=document.querySelector('.box-spin');
+  if(reduceMotion() || !sp || typeof sp.animate!=='function'){ goPledge(); return; }
+  if(boxSpinning) return;
+  boxSpinning=true; sp.classList.add('spinning');
+  const a=sp.animate([{transform:'rotateY(0deg)'},{transform:'rotateY(360deg)'}],{duration:700,easing:'cubic-bezier(.45,.05,.25,1)'});
+  const done=()=>{ boxSpinning=false; if(mode===null && document.querySelector('.box-spin')===sp) goPledge(); };
+  a.onfinish=done; a.oncancel=()=>{ boxSpinning=false; };
+}
 document.addEventListener('pointermove',(e)=>{
   if(reduceMotion() || !document.querySelector('.home-logo')) return;
   if(e.pointerType==='touch' && !tilt.pressed) return;            // touch only tilts while a finger is down
@@ -2527,7 +2602,7 @@ function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) histor
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
