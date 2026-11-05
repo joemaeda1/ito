@@ -439,6 +439,85 @@
   .lang-row button{min-height:44px;padding:0 22px;}
   .seg button{min-height:44px;padding:0 6px;}
   .count-stepper button{width:44px;height:44px;}
+
+  /* ================= v22: color, life and motion =================
+     Every player gets a bead in their own color (the name is always shown too, so color is never the only signal).
+     All movement lives in the "motion allowed" block at the end; with reduced motion everything is simply still. */
+  .bead{--c:#F0805A;position:relative;display:inline-grid;place-items:center;flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--c);color:#2B2440;font-weight:700;font-size:14px;line-height:1;box-shadow:0 8px 14px -8px rgba(0,0,0,.7),inset 0 -3px 0 rgba(0,0,0,.13),inset 0 2px 0 rgba(255,255,255,.38);}
+  .bead.lg{width:46px;height:46px;font-size:19px;}
+  .bead.xl{width:64px;height:64px;font-size:27px;}
+  .bead.host{box-shadow:0 0 0 2px #1B1F3B,0 0 0 4px var(--mustard),0 8px 14px -8px rgba(0,0,0,.7);}
+  .pdot{display:inline-block;flex:0 0 auto;width:11px;height:11px;margin-right:8px;border-radius:50%;background:var(--c,#F0805A);box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);vertical-align:-1px;}
+  .order-card .ocname .nm{display:inline-flex;align-items:center;}
+  .player-chip{padding:5px 14px 5px 5px;gap:10px;font-size:14px;}
+  .player-chip .pname{font-weight:600;}
+  .host-tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mustard);}
+  .pass-bead{display:grid;place-items:center;margin:0 0 14px;}
+
+  /* waiting for everyone to answer: a thread with a bead for each player */
+  .wait-thread{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 0;margin:18px 0 6px;}
+  .wt-slot{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:66px;padding-top:12px;}
+  .wt-bead{position:relative;display:grid;place-items:center;z-index:1;}
+  .wt-slot::before{content:'';position:absolute;left:0;right:0;top:35px;height:2.5px;border-radius:2px;background:repeating-linear-gradient(to right,rgba(255,255,255,.3) 0 7px,transparent 7px 13px);}
+  .wt-slot.done::before{background:var(--thread);box-shadow:0 0 10px rgba(232,113,74,.55);}
+  .wt-slot.pending .wt-bead{translate:0 -9px;}
+  .wt-slot.pending .bead{opacity:.92;}
+  .wt-slot.pending .wt-name{opacity:.7;}
+  .wt-name{max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600;color:rgba(255,250,242,.86);}
+  .wt-check{position:absolute;right:-5px;bottom:-4px;z-index:2;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#82CC87;color:#173b22;box-shadow:0 0 0 2.5px #232852;}
+  .wt-check .ic{width:12px;height:12px;stroke-width:3.2;}
+
+  /* the link between two revealed cards sits on the thread, behind the dots */
+  .thread-wrap::before{left:5px;}
+  .order-card .link{position:absolute;left:-17px;top:20px;width:3px;height:calc(100% + 18px);z-index:-1;pointer-events:none;}
+  .order-card .link.ok::before{content:'';position:absolute;inset:0;border-radius:3px;background:linear-gradient(to bottom,#F0805A,#F2C74B 38%,#82CC87 68%,#5BB6E8);box-shadow:0 0 10px rgba(242,199,75,.55);transform-origin:top center;}
+  .order-card .link.bad::before,.order-card .link.bad::after{content:'';position:absolute;left:0;width:3px;background:#E58F86;}
+  .order-card .link.bad{background:linear-gradient(to bottom,transparent 0 35%,#262B52 35% 65%,transparent 65% 100%);width:7px;margin-left:-2px;}
+  .order-card .link.bad::before{left:2px;top:0;height:36%;border-radius:3px 3px 0 0;transform-origin:top center;clip-path:polygon(0 0,100% 0,100% 84%,70% 100%,45% 86%,15% 100%,0 88%);}
+  .order-card .link.bad::after{left:2px;bottom:0;height:36%;border-radius:0 0 3px 3px;transform-origin:bottom center;clip-path:polygon(0 12%,25% 0,55% 14%,85% 0,100% 12%,100% 100%,0 100%);}
+  .thread-wrap.win::before{background:linear-gradient(to bottom,#F0805A,#F2C74B 25%,#82CC87 50%,#5BB6E8 75%,#A58AE6);box-shadow:0 0 16px rgba(242,199,75,.65);}
+  .thread-wrap.lose::before{opacity:.5;}
+  .sparks{position:absolute;left:0;top:0;bottom:0;width:14px;pointer-events:none;z-index:3;}
+  .spark{position:absolute;left:3px;top:var(--t,50%);width:9px;height:9px;border-radius:50%;background:var(--c,#F2C74B);box-shadow:0 0 8px var(--c,#F2C74B);opacity:0;}
+
+  /* ===== motion (only when the person has not asked for less) ===== */
+  @media (prefers-reduced-motion:no-preference){
+    .bead.bob{animation:bob var(--bp,4s) ease-in-out var(--bd,0s) infinite;}
+    .wt-slot.pending .wt-bead{animation:waitBob var(--bp,2.6s) ease-in-out var(--bd,0s) infinite;}
+    .wt-slot.pending .bead.jig{animation:jiggle 3.1s ease-in-out var(--bd,0s) infinite;}
+    .bead.pop{animation:popIn .5s cubic-bezier(.3,1.5,.5,1) both;}
+    .bead.pop.bob{animation:popIn .5s cubic-bezier(.3,1.5,.5,1) both,bob var(--bp,4s) ease-in-out .5s infinite;}
+    .bead.settle{animation:dropIn .6s cubic-bezier(.3,1.4,.5,1) both;}
+    .wt-check{animation:popIn .45s cubic-bezier(.3,1.6,.5,1) .2s both;}
+    .order-card{animation:settle .3s ease,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.static{animation:floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.tap-next{animation:pulsecard 1.4s ease-in-out infinite,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.bounce{animation:floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite,cardBounce .6s cubic-bezier(.3,1.5,.5,1) 1;}
+    .order-card.shake{animation:floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite,cardShake .55s ease-in-out 1;}
+    .thread-wrap::before{background-size:100% 14px;animation:dashFlow 3.2s linear infinite;}
+    .thread-wrap.win::before{background-size:auto;animation:glowPulse 2.4s ease-in-out infinite;}
+    .link.ok.fresh::before{animation:linkDraw .55s cubic-bezier(.5,0,.2,1) both;}
+    .link.bad.fresh::before{animation:swingTop 1.5s ease-out both;}
+    .link.bad.fresh::after{animation:swingBottom 1.5s ease-out both;}
+    .link.bad:not(.fresh)::before{rotate:3deg;} .link.bad:not(.fresh)::after{rotate:-3deg;}
+    .spark{animation:spark var(--sp,2.2s) ease-out var(--sd,0s) infinite;}
+    .result-banner.success .ic{animation:popIn .5s cubic-bezier(.3,1.6,.5,1) .15s both;}
+  }
+  @keyframes bob{0%,100%{translate:0 0;}50%{translate:0 -4px;}}
+  @keyframes waitBob{0%,100%{translate:0 -9px;}50%{translate:0 -15px;}}
+  @keyframes jiggle{0%,100%{rotate:0deg;}30%{rotate:-7deg;}70%{rotate:7deg;}}
+  @keyframes popIn{0%{transform:scale(.3);opacity:0;}60%{transform:scale(1.14);opacity:1;}100%{transform:scale(1);opacity:1;}}
+  @keyframes dropIn{0%{translate:0 -26px;opacity:.4;}55%{translate:0 4px;opacity:1;}100%{translate:0 0;opacity:1;}}
+  @keyframes floatY{0%,100%{translate:0 0;}50%{translate:0 -2.5px;}}
+  @keyframes dashFlow{to{background-position:0 14px;}}
+  @keyframes linkDraw{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+  @keyframes cardBounce{0%{translate:0 0;}35%{translate:0 -9px;}65%{translate:0 3px;}100%{translate:0 0;}}
+  @keyframes cardShake{0%,100%{rotate:0deg;}20%{rotate:-1.6deg;}45%{rotate:1.4deg;}70%{rotate:-.8deg;}}
+  @keyframes swingTop{0%{rotate:0deg;}18%{rotate:-30deg;}42%{rotate:16deg;}66%{rotate:-9deg;}100%{rotate:3deg;}}
+  @keyframes swingBottom{0%{rotate:0deg;}18%{rotate:28deg;}42%{rotate:-14deg;}66%{rotate:8deg;}100%{rotate:-3deg;}}
+  @keyframes glowPulse{0%,100%{box-shadow:0 0 12px rgba(242,199,75,.5);}50%{box-shadow:0 0 22px rgba(242,199,75,.85);}}
+  @keyframes spark{0%{translate:0 0;opacity:0;scale:.5;}12%{opacity:1;scale:1;}100%{translate:var(--dx,26px) var(--dy,-24px);opacity:0;scale:.4;}}
+  @media (prefers-reduced-motion:reduce){ .number-display{animation:none;} }
 </style>
 </head>
 <body>
@@ -508,7 +587,7 @@ const STRINGS = {
     joinRoomBtn:"ルームに参加する", joiningBtn:"参加中…", homeLink:"ホームへ", loadingText:"読み込み中…",
     soundOnLabel:"サウンドON", soundOffLabel:"サウンドOFF",
     musicOnLabel:"音楽ON", musicOffLabel:"音楽OFF",
-    musicPanelTitle:"音楽", musicVolumeLabel:"音量", musicSwitchOn:"ON", musicSwitchOff:"OFF",
+    hostTag:"ホスト", musicPanelTitle:"音楽", musicVolumeLabel:"音量", musicSwitchOn:"ON", musicSwitchOff:"OFF",
     leaveTitle:"ゲームを終了しますか?", leaveBody:"進行中のゲームから抜けます。", leaveStay:"続ける", leaveConfirm:"抜ける",
     moreFromLink:"joe.maedaの他の作品はこちら ↗",
     err_codeRequired:"ルームコードを入力してください",
@@ -585,7 +664,7 @@ const STRINGS = {
     joinRoomBtn:"Join a room", joiningBtn:"Joining…", homeLink:"Home", loadingText:"Loading…",
     soundOnLabel:"Sound on", soundOffLabel:"Sound off",
     musicOnLabel:"Music on", musicOffLabel:"Music off",
-    musicPanelTitle:"Music", musicVolumeLabel:"Volume", musicSwitchOn:"On", musicSwitchOff:"Off",
+    hostTag:"Host", musicPanelTitle:"Music", musicVolumeLabel:"Volume", musicSwitchOn:"On", musicSwitchOff:"Off",
     leaveTitle:"Leave this game?", leaveBody:"You'll leave the game in progress.", leaveStay:"Stay", leaveConfirm:"Leave",
     moreFromLink:"More from joe.maeda ↗",
     err_codeRequired:"Please enter a room code",
@@ -907,6 +986,55 @@ const ICONS = {
 };
 function icon(name, cls){
   return `<svg class="ic${cls?' '+cls:''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
+
+/* ---------- players: a color and a bead for everyone ---------- */
+const PLAYER_COLORS = ['#F0805A','#F2C74B','#82CC87','#5BB6E8','#A58AE6','#F08BB4','#5ED6C5','#D9B77A'];
+// Everyone derives the same order from the shared data (join time, then id), so a player has the same color on every screen.
+function orderedIds(players){
+  return Object.keys(players||{}).sort((a,b)=>{
+    const ja=(players[a]&&players[a].joinedAt)||0, jb=(players[b]&&players[b].joinedAt)||0;
+    if(ja!==jb) return ja-jb;
+    const na=Number(a), nb=Number(b);
+    if(!isNaN(na) && !isNaN(nb)) return na-nb;
+    return a<b?-1:(a>b?1:0);
+  });
+}
+function playerColor(id, players){ const i=orderedIds(players).indexOf(id); return PLAYER_COLORS[(i<0?0:i)%PLAYER_COLORS.length]; }
+function initialOf(name){ return (Array.from(String(name||'?').trim())[0]||'?').toUpperCase(); }
+function beadHTML(id, players, cls, extraStyle){
+  const p=(players&&players[id])||{};
+  return `<span class="bead${cls?' '+cls:''}" style="--c:${playerColor(id,players)};${extraStyle||''}" aria-hidden="true">${esc(initialOf(p.name))}</span>`;
+}
+function pdotHTML(id, players){ return `<span class="pdot" style="--c:${playerColor(id,players)}" aria-hidden="true"></span>`; }
+// Motion phase comes from the clock, so a re-render carries on the movement instead of restarting it.
+function clockPhase(period){ const now=(typeof performance!=='undefined'?performance.now():Date.now())/1000; return '-'+(now%period).toFixed(2)+'s'; }
+function hashStr(str){ let h=0; for(const c of String(str)) h=(h*31+c.charCodeAt(0))|0; return Math.abs(h); }
+function bobStyle(id){ const per=2.6+(hashStr(id)%16)/10; return `--bp:${per.toFixed(1)}s;--bd:${clockPhase(per)};`; }
+function floatStyle(i){ const per=5.2+((i*7)%9)/5; return ` style="--fp:${per.toFixed(1)}s;--fd:${clockPhase(per)}"`; }
+// A one-off effect (a pop, a bounce) shows for a moment after something first appears, then never replays on re-render.
+const fxSeen = new Map();
+function fx(key, name, ms){
+  const now=Date.now(); if(!fxSeen.has(key)) fxSeen.set(key,now);
+  return (now-fxSeen.get(key) < (ms||900)) ? ' '+name : '';
+}
+function sparksHTML(){
+  let h='<span class="sparks" aria-hidden="true">';
+  for(let i=0;i<24;i++){   // embers that rise along the thread in the players' colors
+    h+=`<span class="spark" style="--t:${(6+Math.random()*90).toFixed(0)}%;--dx:${(-6+Math.random()*16).toFixed(0)}px;--dy:${(-70+Math.random()*30).toFixed(0)}px;--c:${PLAYER_COLORS[i%PLAYER_COLORS.length]};--sd:${(Math.random()*2.4).toFixed(2)}s;--sp:${(1.9+Math.random()*1.1).toFixed(2)}s"></span>`;
+  }
+  return h+'</span>';
+}
+// While answers come in: a thread with one bead per player. Waiting beads bob above it; finished ones drop onto it.
+function waitThreadHTML(activeIds, players, code, round){
+  const done=activeIds.filter(id=>players[id] && players[id].submitted).length;
+  let h=`<div class="wait-thread" role="status" aria-label="${esc(submittedCountText(done,activeIds.length))}">`;
+  orderedIds(players).filter(id=>activeIds.includes(id)).forEach(id=>{
+    const isDone=!!(players[id] && players[id].submitted);
+    const cls = isDone ? ('lg'+fx(code+':done:'+round+':'+id,'settle',1000)) : 'lg jig';
+    h+=`<div class="wt-slot ${isDone?'done':'pending'}"><span class="wt-bead">${beadHTML(id,players,cls,bobStyle(id))}${isDone?`<span class="wt-check">${icon('check')}</span>`:''}</span><span class="wt-name">${esc(players[id].name)}</span></div>`;
+  });
+  return h+'</div>';
 }
 
 function topbarHTML(showHome){
@@ -1898,9 +2026,9 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     html += `<div class="thread-wrap">`;
     order.forEach((id,idx)=>{
       const p=playersObj[id];
-      html += `<div class="order-card"><div class="oc-row">
+      html += `<div class="order-card"${floatStyle(idx)}><div class="oc-row">
         <div style="flex:1;">
-          <div class="ocname"><span>${esc(p.name)}</span></div>
+          <div class="ocname"><span class="nm">${pdotHTML(id,playersObj)}${esc(p.name)}</span></div>
           <div class="occlue">${p.clue ? esc(p.clue) : '<span style=\"color:#a89; font-size:14px;\">'+t('noClueText')+'</span>'}</div>
         </div>
         <div class="order-controls">
@@ -1921,22 +2049,33 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     }
   } else if(phase==='reveal'){
     const n=order.length, rev=revealedCount(revealed,n), done=rev>=n;
+    const success = done ? orderIsCorrect(playersObj,order) : null;
+    const fxk = cb.revealNext+':'+round+':'+rev;      // one-off effects belong to this exact flip
     if(done){
-      const success=orderIsCorrect(playersObj,order);
       html += `<div class="result-banner ${success?'success':'fail'}">${icon(success?'check':'x')}<div class="big">${success?t('successBannerText'):t('failBannerText')}</div></div>`;
     } else {
       html += `<div class="reveal-progress">${revealProgressText(rev,n)}</div>`;
     }
-    html += `<div class="thread-wrap">`;
+    html += `<div class="thread-wrap${done?(success?' win':' lose'):''}">`;
+    if(done && success) html += sparksHTML();
     order.forEach((id,idx)=>{
       const p=playersObj[id], shown=idx<rev, isNext=(idx===rev && !done && hostAllowed);
       const numHTML = shown
         ? `<span class="ocnum${idx===rev-1?' flip-in':''}">${p.number}</span>`
         : `<span class="ocnum ocnum-hidden">${isNext?t('tapToReveal'):'?'}</span>`;
-      html += `<div class="order-card static${isNext?' tap-next':''}"${isNext?` onclick="${cb.revealNext}()"`:''}><div class="oc-row"><div style="flex:1;">
-        <div class="ocname"><span>${esc(p.name)}</span>${numHTML}</div>
+      let link='', cardFx='';
+      if(idx<n-1 && idx+1<rev){
+        const ok = p.number < playersObj[order[idx+1]].number;
+        link=`<span class="link ${ok?'ok':'bad'}${idx===rev-2?fx(fxk+':link','fresh',2200):''}" aria-hidden="true"></span>`;
+      }
+      if(idx===rev-1 && idx>0){            // the card that was just flipped reacts to how it landed
+        const prevOk = playersObj[order[idx-1]].number < p.number;
+        cardFx = fx(fxk+':card', prevOk?'bounce':'shake', 1200);
+      }
+      html += `<div class="order-card static${isNext?' tap-next':''}${cardFx}"${floatStyle(idx)}${isNext?` onclick="${cb.revealNext}()"`:''}><div class="oc-row"><div style="flex:1;">
+        <div class="ocname"><span class="nm">${pdotHTML(id,playersObj)}${esc(p.name)}</span>${numHTML}</div>
         <div class="occlue">${p.clue ? esc(p.clue) : ''}</div>
-      </div></div></div>`;
+      </div></div>${link}</div>`;
       if(idx<n-1 && idx+1<rev){
         const ok = p.number < playersObj[order[idx+1]].number;
         html += `<div class="connector ${ok?'ok':'bad'}">${icon(ok?'check':'x')}<span>${ok?t('connectorOkText'):t('connectorBadText')}</span></div>`;
@@ -2147,8 +2286,9 @@ function renderOnlineMode(){
     html += `<div class="room-code">${room.code}</div>
       <div class="copy-row"><button class="btn btn-ghost btn-sm" onclick="copyCode()">${t('copyCodeBtn')}</button><span id="copy-status" class="helper"></span></div>`;
     html += `<div class="player-list">`;
-    Object.values(room.players).forEach(p=>{
-      html += `<div class="player-chip">${p===room.players[room.hostId]?'<span class=\"host-dot\" aria-hidden=\"true\"></span>':''}${esc(p.name)}</div>`;
+    orderedIds(room.players).forEach(id=>{
+      const p=room.players[id], host=(id===room.hostId);
+      html += `<div class="player-chip${host?' is-host':''}">${beadHTML(id,room.players,'bob'+(host?' host':'')+fx(room.code+':lobby:'+id,'pop',900),bobStyle(id))}<span class="pname">${esc(p.name)}</span>${host?`<span class="host-tag">${t('hostTag')}</span>`:''}</div>`;
     });
     html += `</div>`;
     if(isHost()){
@@ -2190,7 +2330,8 @@ function renderOnlineMode(){
       html += `<p class="subtitle">${t('waitingOthersText')}</p>`;
     }
     const submittedCount = activeIds.filter(id=>room.players[id] && room.players[id].submitted).length;
-    html += `<div class="helper">${submittedCountText(submittedCount, activeIds.length)}</div>`;
+    html += waitThreadHTML(activeIds, room.players, room.code, room.round);
+    html += `<div class="helper" style="text-align:center;">${submittedCountText(submittedCount, activeIds.length)}</div>`;
     return html;
   }
 
@@ -2249,6 +2390,7 @@ function renderLocalMode(){
     const p=local.players[id];
     html += `<div class="round-pill">${roundLabel(local.round)}</div>`;
     html += `<div class="card" style="text-align:center;padding:34px 18px;">
+      <div class="pass-bead">${beadHTML(id,local.players,'xl bob',bobStyle(id))}</div>
       <div style="font-size:15px;color:var(--ink-soft);margin-bottom:10px;">${t('nextTurnLabel')}</div>
       <div style="font-size:23px;font-weight:900;margin-bottom:18px;">${esc(withHonorific(p.name))}</div>
       <p style="font-size:13px;color:var(--ink-soft);">${t('passInstructions')}</p>
