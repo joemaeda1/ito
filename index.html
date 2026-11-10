@@ -618,6 +618,42 @@
   @keyframes cardFlip{0%{transform:perspective(900px) rotate(var(--tilt,0deg)) rotateY(180deg);}100%{transform:perspective(900px) rotate(var(--tilt,0deg)) rotateY(0deg);}}
   @keyframes flipBack{0%,49.9%{opacity:1;}50%,100%{opacity:0;}}
   @keyframes hop{0%,100%{translate:0 0;}40%{translate:0 -9px;}}
+
+  /* v26: lives, result lines, flip target, small moments */
+  #app{overflow-x:clip;overflow-clip-margin:0;}
+  .lives{display:flex;justify-content:center;gap:10px;margin:2px 0 10px;}
+  .life{display:grid;place-items:center;width:30px;height:30px;color:#F08B8B;position:relative;}
+  .life .ic{width:24px;height:24px;stroke-width:1.9;}
+  .life.on .ic path{fill:rgba(240,139,139,.35);}
+  .life.off{color:rgba(255,255,255,.22);}
+  .life-flash{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(229,90,84,0);z-index:50;}
+  .result-banner .res-sub{flex-basis:100%;text-align:center;font-size:14px;font-weight:600;opacity:.8;margin-top:2px;}
+  .result-banner .res-lives{font-size:16px;font-weight:600;opacity:.8;}
+  .result-banner.cleared{color:#E8F0FF;}
+  .result-banner.over .big{font-size:32px;color:#ffd5d1;}
+  .out-lives{text-align:center;margin:4px 0 8px;color:#ffd5d1;} .out-lives .big{font-family:var(--display);font-size:22px;font-weight:700;}
+  .order-card.tap-next{cursor:pointer;}
+  .think-beads{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:-4px 0 16px;}
+  .tok-next{cursor:pointer;border:0;font:inherit;}
+  .number-display.landed{color:inherit;}
+  @media (prefers-reduced-motion:no-preference){
+    .topic-banner.dealt{animation:dealIn .7s cubic-bezier(.3,1.3,.5,1) both;}
+    .life.breaking .ic{animation:heartBreak .9s ease-out both;}
+    .life-flash{animation:edgeFlash .8s ease-out both;}
+    .out-lives.fresh{animation:popIn .5s cubic-bezier(.3,1.5,.5,1) both;}
+    .result-banner.cleared.fresh .res-line,.result-banner.success.fresh .res-line{animation:popIn .55s cubic-bezier(.3,1.6,.5,1) both;}
+    .number-display.landed{animation:landPop .35s cubic-bezier(.3,1.6,.5,1);}
+    .thread-wrap.wave .bead.oc-av{animation:hop .5s cubic-bezier(.3,1.6,.5,1) calc(var(--wi,0) * 110ms + .35s) 1 both;}
+    .thread-wrap.win:not(.wave) .bead.oc-av{animation:none;}
+    .bead.oc-av.dizzy{animation:dizzy 1.1s ease-in-out .4s 1 both;}
+    .tt-sweat .bead::after{content:"";position:absolute;right:6%;top:4%;width:22%;height:30%;max-width:9px;max-height:12px;background:#9fd8ff;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;clip-path:polygon(50% 0,100% 62%,92% 88%,50% 100%,8% 88%,0 62%);animation:sweat 1.2s ease-in infinite;}
+  }
+  @keyframes dealIn{0%{opacity:0;transform:translateY(-26px) rotate(-4deg) scale(.96);}60%{opacity:1;transform:translateY(3px) rotate(1.2deg);}80%{transform:translateY(0) rotate(-.6deg);}100%{transform:none;}}
+  @keyframes heartBreak{0%{transform:scale(1);}20%{transform:scale(1.35) rotate(-8deg);color:#ff6b6b;}45%{transform:scale(1) rotate(10deg);}70%{transform:translateY(4px) rotate(-6deg);opacity:.6;}100%{transform:none;opacity:1;}}
+  @keyframes edgeFlash{0%{box-shadow:inset 0 0 0 0 rgba(229,90,84,0);}25%{box-shadow:inset 0 0 70px 12px rgba(229,90,84,.45);}100%{box-shadow:inset 0 0 0 0 rgba(229,90,84,0);}}
+  @keyframes landPop{0%{transform:scale(1);}50%{transform:scale(1.12);}100%{transform:scale(1);}}
+  @keyframes dizzy{0%{transform:rotate(0);}60%{transform:rotate(380deg);}80%{transform:rotate(350deg);}100%{transform:rotate(360deg);}}
+  @keyframes sweat{0%{opacity:0;transform:translateY(-2px);}25%{opacity:1;}100%{opacity:0;transform:translateY(14px);}}
 </style>
 </head>
 <body>
@@ -735,7 +771,7 @@ const STRINGS = {
     playerCountLabel:"人数", startLocalBtn:"はじめる",
     nextTurnLabel:"次の番", passInstructions:"画面をこの人に渡してください。準備ができたらタップ。",
     revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次の人へ渡す",
-    tapToReveal:"タップして表示", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"隠して次の人へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
+    tapToReveal:"タップして表示", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"隠して次の人へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
     retopicHeading:"次のお題を決める", thisTopicStartBtn:"このお題で始める",
     bankHeading:"お題バンク",
     bankIntro:"みんなで作るお題集。気に入ったら、ゲーム中の「みんな」からも選べます。",
@@ -812,7 +848,7 @@ const STRINGS = {
     playerCountLabel:"Number of players", startLocalBtn:"Start",
     nextTurnLabel:"Up next", passInstructions:"Hand the device to this person. Tap when ready.",
     revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm & pass to next player",
-    tapToReveal:"Tap to reveal", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Hide and pass", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
+    tapToReveal:"Tap to reveal", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Hide and pass", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
     retopicHeading:"Choose the next topic", thisTopicStartBtn:"Start with this topic",
     bankHeading:"Topic bank",
     bankIntro:"A topic collection built together. Pick these in-game under “Community.”",
@@ -1080,6 +1116,8 @@ const ICONS = {
   'help':'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.6a2.6 2.6 0 1 1 3.7 2.4c-.9.5-1.2 1-1.2 1.9"/><path d="M12 17.1h.01"/>',
   'book':'<path d="M3.8 5.6c2.8-1.1 5.5-.8 8.2 1.1 2.7-1.9 5.4-2.2 8.2-1.1v12.2c-2.8-1.1-5.5-.8-8.2 1.1-2.7-1.9-5.4-2.2-8.2-1.1z"/><path d="M12 6.7v12.2"/>',
   'chev-right':'<path d="M9.5 5.5L16 12l-6.5 6.5"/>', 'chev-left':'<path d="M14.5 5.5L8 12l6.5 6.5"/>',
+  'flip':'<rect x="8" y="3.5" width="9" height="13" rx="2"/><path d="M4.5 12.5a7.5 7.5 0 0 0 8.5 7.6"/><path d="M10.6 18.4l2.6 1.8-2 2.3"/>',
+  'heart':'<path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
   'clock':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 3h5"/>',
   'chev-up':'<path d="M5.5 14.5L12 8l6.5 6.5"/>', 'chev-down':'<path d="M5.5 9.5L12 16l6.5-6.5"/>',
   'check':'<path d="M5 12.8l4.6 4.6L19 7.4"/>', 'x':'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
@@ -1955,7 +1993,7 @@ function moveOrder(idx,dir){
   const j=idx+dir, rev=room.phase==='reveal'?revealedCount(room.revealed,o.length):0;
   if(j<0||j>=o.length||idx<rev||j<rev)return;     // flipped cards are locked in place
   [o[idx],o[j]]=[o[j],o[idx]];
-  room.order=o; render();
+  room.order=o; slideRender();
   safeWrite(()=>update(roomRef(room.code), {order:o}));
 }
 function hostReveal(){
@@ -1989,8 +2027,20 @@ function hostStartTimer(){
   render();
   safeWrite(()=>update(roomRef(room.code), {timerEnd:room.timerEnd, timerSecs:secs}));
 }
+function hostEndGame(){
+  if(!isHost() || room.phase!=='reveal') return;
+  const n=(room.order||[]).length; room.revealed=n;
+  const success=orderIsCorrect(room.players,room.order);
+  room.lastResult={success}; room.history=(room.history||[]).concat([success]);
+  render();
+  safeWrite(()=>update(roomRef(room.code), {revealed:n, lastResult:{success}, history:room.history}));
+}
 function hostNextRound(){
   if(!isHost())return;
+  const fin = room.phase==='reveal' && room.lastResult && room.order && revealedCount(room.revealed,room.order.length)>=room.order.length;
+  const gs=nextGameState({livesStart:room.livesStart, cleared:room.cleared}, room.players, room.order||[], !!fin);
+  room.livesStart=gs.livesStart; room.cleared=gs.cleared;
+  safeWrite(()=>update(roomRef(room.code), {livesStart:gs.livesStart, cleared:gs.cleared}));
   room.phase='lobby';
   room.lastResult=null; render();
   safeWrite(()=>update(roomRef(room.code), {phase:'lobby', lastResult:null, revealed:null}));
@@ -2046,6 +2096,9 @@ function startLocalGame(){
 function beginLocalRound(){
   const l=currentLang();
   const ids=Object.keys(local.players);
+  const fin = local.phase==='reveal' && local.lastResult && revealedCount(local.revealed,(local.order||[]).length)>=(local.order||[]).length;
+  const gs=nextGameState({livesStart:local.livesStart, cleared:local.cleared}, local.players, local.order||[], !!fin);
+  local.livesStart=gs.livesStart; local.cleared=gs.cleared;
   let topic=local.pendingTopic;
   if(local.topicMode==='presetRandom' || !topic){
     topic=pickRandomTopic(local.usedTopics, l);
@@ -2070,6 +2123,19 @@ function numberBodyHTML(num, shown){
     : `<div class="number-display number-hidden">•••</div><div class="num-hint">${t('tapToReveal')}</div>`;
 }
 // Toggles in place (no re-render) so whatever the player has typed in the hint box is kept.
+// Your number rolls up quickly and lands on the real one (a little slot-machine moment).
+function countUp(el, n){
+  if(!el || reduceMotion() || typeof requestAnimationFrame!=='function' || !(n>1)) return;
+  const t0=performance.now(), dur=Math.min(700, 300+n*4); let last=0;
+  const step=now=>{
+    if(!el.isConnected) return;
+    const k=Math.min(1,(now-t0)/dur), v=Math.max(1,Math.round(n*(1-Math.pow(1-k,3))));
+    if(v!==last){ el.textContent=v; if(v-last>=Math.max(1,n/10)||k===1){ playTone(900+v*4,0,0.03,'sine',0.04); } last=v; }
+    if(k<1) requestAnimationFrame(step); else { el.textContent=n; el.classList.add('landed'); }
+  };
+  el.textContent='1'; requestAnimationFrame(step);
+  setTimeout(()=>{ if(el.isConnected && el.textContent!==String(n)){ el.textContent=n; el.classList.add('landed'); } }, dur+120);   // lands even if frames stall
+}
 function toggleLocalNumber(){
   const el=document.getElementById('num-card'); if(!el||!local) return;
   const ids=Object.keys(local.players);
@@ -2077,6 +2143,7 @@ function toggleLocalNumber(){
   localNumberShown=!localNumberShown;
   el.setAttribute('aria-pressed', localNumberShown?'true':'false');
   el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown);
+  if(localNumberShown) countUp(el.querySelector('.number-display'), p.number);
 }
 // Online answer screen: tap the card to hide or show your number, in place so typed text stays.
 let onlineNumberShown=true, onlineNumberKey='';
@@ -2085,6 +2152,7 @@ function toggleOnlineNumber(){
   onlineNumberShown=!onlineNumberShown;
   el.setAttribute('aria-pressed', onlineNumberShown?'true':'false');   // same as Local: pressed = shown
   el.querySelector('.num-body').innerHTML=numberBodyHTML(room.players[myId].number, onlineNumberShown);
+  if(onlineNumberShown) countUp(el.querySelector('.number-display'), room.players[myId].number);
 }
 // Pass 1: everyone peeks at their number. Then the thinking timer. Then pass 2 to type (or straight to arranging when said out loud).
 function localPeekDone(){
@@ -2117,7 +2185,7 @@ function localMoveOrder(idx,dir){
   if(j<0||j>=o.length||idx<rev||j<rev)return;     // flipped cards are locked in place
   [o[idx],o[j]]=[o[j],o[idx]];
   local.order=o;
-  render();
+  slideRender();
 }
 function localReveal(){
   local.phase='reveal'; local.revealed=0; local.lastResult=null;
@@ -2138,7 +2206,14 @@ function localRevealNext(){
   }
   render();
 }
-function localGoTopicPick(){ local.phase='retopic'; render(); }
+function localGoTopicPick(){ sweepThen(()=>{ local.phase='retopic'; render(); }); }
+// Out of lives: flip everything that is left at once, at no cost, and end the game.
+function localEndGame(){
+  if(!local || local.phase!=='reveal') return;
+  const o=local.order; local.revealed=o.length;
+  const success=orderIsCorrect(local.players,o); local.lastResult={success}; local.history=(local.history||[]).concat([success]);
+  playFailSound(); render();
+}
 function localSetTopicMode(m){
   local.topicMode=m; local.pendingTopic=null;
   if(m==='community') ensureCommunityPickLoaded(currentLang());
@@ -2163,8 +2238,26 @@ function localSaveCustomTopic(){
   render();
 }
 function localStartNextRound(){
-  if(local.topicMode==='presetRandom'){ beginLocalRound(); render(); }
+  if(local.topicMode==='presetRandom'){ sweepThen(()=>{ beginLocalRound(); render(); }); }
   else { localGoTopicPick(); }
+}
+// Next round: the cards sweep off to the side before the new topic drops in.
+function sweepThen(fn){
+  const cards=[...document.querySelectorAll('.order-card')];
+  if(reduceMotion() || !cards.length || typeof cards[0].animate!=='function'){ fn(); return; }
+  cards.forEach((c,i)=>c.animate([{transform:getComputedStyle(c).transform==='none'?'none':getComputedStyle(c).transform, opacity:1},{transform:'translateX(115vw) rotate(10deg)', opacity:.6}],{duration:380, delay:i*45, easing:'cubic-bezier(.5,0,.8,.4)', fill:'forwards'}));
+  setTimeout(fn, 380+cards.length*45);
+}
+// Moving a card slides it into its new spot (measure, redraw, then animate from the old place).
+function slideRender(){
+  const before={}; document.querySelectorAll('.order-card[data-id]').forEach(el=>before[el.dataset.id]=el.getBoundingClientRect().top);
+  render();
+  if(reduceMotion()) return;
+  document.querySelectorAll('.order-card[data-id]').forEach(el=>{
+    const b=before[el.dataset.id]; if(b==null || typeof el.animate!=='function') return;
+    const dy=b-el.getBoundingClientRect().top; if(Math.abs(dy)<2) return;
+    el.animate([{translate:'0 '+dy+'px'},{translate:'0 0'}],{duration:260, easing:'cubic-bezier(.2,.8,.2,1)', composite:'add'});
+  });
 }
 
 /* small wrappers so the shared topic selector (used pre-start, where `local` may not exist yet) works */
@@ -2248,19 +2341,42 @@ function renderErrorBanner(){
 }
 
 function topicBannerHTML(topic){
-  return `<div class="topic-banner"><div class="ttext">${esc(topic.text)}</div>
+  return `<div class="topic-banner${fx('tb:'+topic.text,' dealt',900)}"><div class="ttext">${esc(topic.text)}</div>
     <div class="scale-rows">
       <div class="scale-row"><span class="scale-num">1 →</span><span class="scale-txt">${esc(topic.low)}</span></div>
       <div class="scale-row"><span class="scale-num">100 →</span><span class="scale-txt">${esc(topic.high)}</span></div>
     </div></div>`;
 }
 
+// Lives: 3 per game. Each wrong flip (a card lower than the one below it) costs one. Derived from the flipped cards,
+// so every phone agrees without extra writes. livesStart = lives at the start of this round; cleared = rounds cleared this game.
+const LIVES=3;
+function mistakesIn(players, order, rev){ let m=0; for(let i=1;i<Math.min(rev,order.length);i++){ if(players[order[i]].number < players[order[i-1]].number) m++; } return m; }
+function livesNow(g, players, order, rev){ const st=(g && g.livesStart!=null) ? g.livesStart : LIVES; return Math.max(0, st - mistakesIn(players, order, rev)); }
+// called when the next round starts: carry lives over, or start a fresh game after game over
+function nextGameState(g, players, order, finished){
+  const st=(g.livesStart!=null)?g.livesStart:LIVES, cl=g.cleared||0;
+  if(!finished) return {livesStart:st, cleared:cl};
+  const left=livesNow(g, players, order, order.length);
+  return left>0 ? {livesStart:left, cleared:cl+1} : {livesStart:LIVES, cleared:0};
+}
+function livesLeftText(n){ return currentLang()==='en' ? (n+(n===1?' life left':' lives left')) : ('残りライフ '+n); }
+function roundsClearedText(n){ return currentLang()==='en' ? (n+(n===1?' round cleared':' rounds cleared')) : (n+'ラウンドクリア'); }
+const WIN_LINES={en:['Bang bang!','Yee-haw!','Nailed it!','Mind readers!','Tied tight!'], ja:['ビンゴ!','完璧!','以心伝心!','天才か!','つながった!']};
+const MISS_LINES={en:['Better luck next time','Do better','Not good enough','Yikes','Who said that?'], ja:['次こそ!','出直してこい','まだまだ!','誰だ今の','あーあ']};
+function pickLine(set, key){ const a=set[currentLang()==='ja'?'ja':'en']; return a[hashStr(key)%a.length]; }
+function livesHTML(lives, start, key){
+  let h=`<div class="lives" role="img" aria-label="${esc(currentLang()==='en'?('Lives: '+lives+' of '+LIVES):('ライフ '+lives+'/'+LIVES))}">`;
+  const lost=lives<start, fresh=lost && !!fx(key+':lost:'+lives,'x',1400);   // a heart breaks only when it is lost this round
+  for(let i=0;i<LIVES;i++) h+=`<span class="life${i<lives?' on':' off'}${fresh&&i===lives?' breaking':''}">${icon('heart')}</span>`;
+  return h+'</div>'+(fresh?'<div class="life-flash" aria-hidden="true"></div>':'');
+}
 function orderIsCorrect(players, order){ return order.every((id,i)=> i===order.length-1 || players[id].number < players[order[i+1]].number); }
 // How many cards are face up. A missing value (older rooms) means everything is already revealed.
 function revealedCount(rev, n){ return (rev==null) ? n : Math.max(0, Math.min(n, rev)); }
 function revealProgressText(a,b){ return currentLang()==='en' ? ('Revealed '+a+' of '+b) : (b+'枚中'+a+'枚めくりました'); }
 
-function renderOrderAndReveal(playersObj, order, topic, phase, round, history, hostAllowed, cb, revealed){
+function renderOrderAndReveal(playersObj, order, topic, phase, round, history, hostAllowed, cb, revealed, game){
   let html='';
   html += renderHistoryDots(history);
   html += `<div class="round-pill">${roundLabel(round)}</div>`;
@@ -2270,16 +2386,26 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
   const n=order.length, rev = phase==='reveal' ? revealedCount(revealed,n) : 0, done = phase==='reveal' && rev>=n;
   const success = done ? orderIsCorrect(playersObj,order) : null;
   const fxk = cb.revealNext+':'+round+':'+rev;      // one-off effects belong to this exact flip
+  const g=game||{}, lives=livesNow(g, playersObj, order, rev), over=lives<=0, lkey=cb.revealNext+':'+round;
+  html += livesHTML(lives, (g.livesStart!=null?g.livesStart:LIVES), lkey);
   if(done){
-    const once=fx(cb.revealNext+':result:'+round,'fresh',1800);
-    html += `<div class="result-banner ${success?'success':'fail'}${once}"><div class="res-line">${icon(success?'check':'x')}<div class="big">${success?t('successBannerText'):t('failBannerText')}</div></div>${resultThreadHTML(success)}${success&&once?confettiHTML():''}</div>`;
+    const once=fx(cb.revealNext+':result:'+round,'fresh',1800), lineKey=round+':'+topic.text;
+    if(over){
+      html += `<div class="result-banner fail over${once}"><div class="res-line"><div class="big">${t('gameOverText')}</div></div><div class="res-sub">${esc(pickLine(MISS_LINES,lineKey))} · ${esc(roundsClearedText(g.cleared||0))}</div>${resultThreadHTML(false)}</div>`;
+    } else if(success){
+      html += `<div class="result-banner success${once}"><div class="res-line">${icon('check')}<div class="big">${esc(pickLine(WIN_LINES,lineKey))}</div></div><div class="res-sub">${t('roundClearedText')} · ${esc(livesLeftText(lives))}</div>${resultThreadHTML(true)}${once?confettiHTML():''}</div>`;
+    } else {
+      html += `<div class="result-banner cleared${once}"><div class="res-line"><div class="big">${t('roundClearedText')}</div><span class="res-lives">· ${esc(livesLeftText(lives))}</span></div>${resultThreadHTML(true)}</div>`;
+    }
+  } else if(over){
+    html += `<div class="out-lives${fx(lkey+':out','fresh',1200)}"><div class="big">${t('outOfLivesText')}</div></div>`;
   } else if(rev===0){
     html += `<p class="subtitle">${t('orderInstructions')}</p>`;
   } else {
     html += `<div class="reveal-progress">${revealProgressText(rev,n)}</div>`;
   }
   if(!done) html += `<div class="order-anchor order-anchor-top"><span class="anchor-label">${icon('chev-up')}${t('orderHighLabel')}</span><span class="anchor-end">${esc(topic.high)}</span></div>`;
-  html += `<div class="thread-wrap${done?(success?' win':' lose'):''}">`;
+  html += `<div class="thread-wrap${done?((success||!over)?' win':' lose'):''}${done&&(success||!over)?fx(lkey+':wave','wave',2600):''}">`;
   if(done && success) html += sparksHTML();
   for(let idx=n-1; idx>=0; idx--){         // top of the screen is the highest spot (the array runs lowest to highest)
     const id=order[idx], p=playersObj[id], shown=idx<rev, isNext=(idx===rev && !done && hostAllowed), canMove=!done && idx>=rev;
@@ -2294,13 +2420,14 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     }
     const tok = shown
       ? `<span class="tok" style="--c:${playerColor(id,playersObj)}">${p.number}</span>`
-      : (isNext ? `<button type="button" class="tok tok-next" onclick="${cb.revealNext}()" aria-label="${esc(t('revealNextBtn'))}">${icon('chev-up')}</button>` : '');
+      : (isNext ? `<button type="button" class="tok tok-next" onclick="${cb.revealNext}()" aria-label="${esc(t('revealNextBtn'))}">${icon('flip')}</button>` : '');
     const ctr = canMove ? `<div class="order-controls">
         <button aria-label="${esc(t('moveUpLabel'))}" onclick="${cb.move}(${idx},1)" ${idx===n-1?'disabled':''}>${icon('chev-up')}</button>
         <button aria-label="${esc(t('moveDownLabel'))}" onclick="${cb.move}(${idx},-1)" ${idx===rev?'disabled':''}>${icon('chev-down')}</button>
       </div>` : '';
-    html += `<div class="order-card deal${shown?' static':''}${isNext?' tap-next':''}${cardFx}" style="--tilt:${idx%2?1.4:-1.4}deg;${floatStyle(idx).replace(/^ style="|"$/g,'')}"><div class="oc-row">
-        ${beadHTML(id,playersObj,'oc-av')}
+    const breaker = done && idx>0 && p.number < playersObj[order[idx-1]].number;
+    html += `<div class="order-card deal${shown?' static':''}${isNext?' tap-next':''}${cardFx}" data-id="${esc(id)}" style="--wi:${idx};--tilt:${idx%2?1.4:-1.4}deg;${floatStyle(idx).replace(/^ style="|"$/g,'')}"><div class="oc-row">
+        ${beadHTML(id,playersObj,'oc-av'+(breaker?' breaker'+fx(lkey+':dizzy:'+id,' dizzy',2000):''))}
         <div class="oc-main"><div class="ocname">${esc(p.name)}</div>${p.clue?`<div class="occlue">${esc(p.clue)}</div>`:''}</div>
         ${tok}${ctr}
       </div>${link}</div>`;
@@ -2311,18 +2438,25 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
   }
   html += `</div>`;
   if(!done) html += `<div class="order-anchor order-anchor-bottom"><span class="anchor-label">${icon('chev-down')}${t('orderLowLabel')}</span><span class="anchor-end">${esc(topic.low)}</span></div>`;
-  if(!done){
+  if(!done && over && rev<n){
+    if(hostAllowed) html += `<button class="btn btn-primary" onclick="${cb.revealNext}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" style="margin-top:8px;" onclick="${cb.endGame}()">${t('endGameBtn')}</button>`;
+    else html += `<div class="helper">${t('waitingRevealText')}</div>`;
+  } else if(!done){
     if(hostAllowed) html += `<button class="btn btn-primary" onclick="${cb.revealNext}()">${t('revealNextBtn')}</button>`;
     else html += `<div class="helper">${rev===0?t('waitingHostJudgeText'):t('waitingRevealText')}</div>`;
   } else if(hostAllowed){
-    html += `<button class="btn btn-primary" onclick="${cb.next}()">${t('playAgainBtn')}</button>`;
-    if(cb.changeTopic) html += `<button class="btn-textlink" onclick="${cb.changeTopic}()">${t('changeTopicBtn')}</button>`;
+    html += `<button class="btn btn-primary" onclick="${cb.next}()">${over?t('newGameBtn'):t('playAgainBtn')}</button>`;
+    if(cb.changeTopic && !over) html += `<button class="btn-textlink" onclick="${cb.changeTopic}()">${t('changeTopicBtn')}</button>`;
   } else {
     html += `<div class="helper">${t('waitingNextRoundText')}</div>`;
   }
   return html;
 }
 
+document.addEventListener('click',e=>{
+  const card=e.target.closest && e.target.closest('.order-card.tap-next'); if(!card || e.target.closest('button')) return;
+  const b=card.querySelector('.tok-next'); if(b) b.click();
+});
 /* ---------- thinking timer: a thread ring that shrinks, with a ticking countdown track ---------- */
 let timerLoop=0, timerLastSec=null, timerLastHalf=null, timerStartedAt=0;
 function timerHTML(endsAt, total){
@@ -2359,12 +2493,13 @@ function ensureTimerLoop(){
 }
 function timerFrame(){
   const el=document.getElementById('think-timer');
-  if(!el){ clearInterval(timerLoop); timerLoop=0; return; }
+  if(!el){ clearInterval(timerLoop); timerLoop=0; document.body.classList.remove('tt-sweat'); return; }
   const end=+el.dataset.end, total=(+el.dataset.total)||60, left=Math.max(0,end-Date.now()), sec=Math.ceil(left/1000);
   const ring=el.querySelector('.tt-ring'), C=2*Math.PI*44;
   if(ring) ring.setAttribute('stroke-dashoffset', (C*(1-left/(total*1000))).toFixed(1));
   const num=el.querySelector('.tt-num'); if(num && num.textContent!==String(sec)) num.textContent=sec;
   el.classList.toggle('last', sec<=10 && left>0);
+  document.body.classList.toggle('tt-sweat', sec<=10 && left>0);   // characters on screen start to sweat
   if(left>0){
     if(timerLastSec!==null && sec!==timerLastSec) countdownTick(sec%2===0, sec%2===0 || sec<=10);
     const half=Math.ceil(left/500);
@@ -2610,7 +2745,7 @@ function renderOnlineMode(){
       </div>`;
       return html;
     }
-    const nk=room.code+':'+room.round; if(onlineNumberKey!==nk){ onlineNumberKey=nk; onlineNumberShown=true; }
+    const nk=room.code+':'+room.round; if(onlineNumberKey!==nk){ onlineNumberKey=nk; onlineNumberShown=true; setTimeout(()=>{ const c=document.getElementById('on-num-card'); if(c && room && room.players[myId]) countUp(c.querySelector('.number-display'), room.players[myId].number); },0); }
     html += `<button type="button" id="on-num-card" class="card number-stage number-btn" aria-pressed="${onlineNumberShown?'true':'false'}" onclick="toggleOnlineNumber()"><div class="lab">${t('yourNumberLabel')}</div>
       <div class="num-body">${numberBodyHTML(me.number, onlineNumberShown)}</div></button>`;
     html += renderErrorBanner();
@@ -2634,7 +2769,7 @@ function renderOnlineMode(){
     if(!activeIds.includes(myId)){
       html += `<div class="helper spectator-note">${icon('eye')}<span>${t('spectatorWatchingText')}</span></div>`;
     }
-    html += renderOrderAndReveal(room.players, room.order, room.topic, room.phase, room.round, room.history, isHost(), {move:'moveOrder', reveal:'hostReveal', revealNext:'hostRevealNext', next:'hostNextRound'}, room.revealed);
+    html += renderOrderAndReveal(room.players, room.order, room.topic, room.phase, room.round, room.history, isHost(), {move:'moveOrder', reveal:'hostReveal', revealNext:'hostRevealNext', next:'hostNextRound', endGame:'hostEndGame'}, room.revealed, {livesStart:room.livesStart, cleared:room.cleared});
     return html;
   }
 
@@ -2717,6 +2852,7 @@ function renderLocalMode(){
     html += topicBannerHTML(local.topic);
     html += `<h2 class="think-head">${t('thinkHeading')}</h2><p class="subtitle" style="text-align:center;">${local.respond==='say'?t('thinkSubSay'):t('thinkSubType')}</p>`;
     html += timerHTML(local.thinkEnds, local.timer);
+    html += `<div class="think-beads">${Object.keys(local.players).map(id=>beadHTML(id,local.players,'lg bob',bobStyle(id))).join('')}</div>`;
     html += `<button class="btn btn-ghost" onclick="localAfterThink()">${t('skipBtn')}</button>`;
     return html;
   }
@@ -2735,7 +2871,7 @@ function renderLocalMode(){
   }
 
   if(local.phase==='order' || local.phase==='reveal'){
-    html += renderOrderAndReveal(local.players, local.order, local.topic, local.phase, local.round, local.history, true, {move:'localMoveOrder', reveal:'localReveal', revealNext:'localRevealNext', next:'localStartNextRound', changeTopic:'localGoTopicPick'}, local.revealed);
+    html += renderOrderAndReveal(local.players, local.order, local.topic, local.phase, local.round, local.history, true, {move:'localMoveOrder', reveal:'localReveal', revealNext:'localRevealNext', next:'localStartNextRound', changeTopic:'localGoTopicPick', endGame:'localEndGame'}, local.revealed, {livesStart:local.livesStart, cleared:local.cleared});
     return html;
   }
 
@@ -2848,7 +2984,7 @@ function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) histor
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
