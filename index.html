@@ -729,6 +729,30 @@
   .order-anchor .anchor-label{gap:10px;font-family:var(--display);font-size:18px;font-weight:700;color:var(--white);}
   .anc-badge{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(232,113,74,.16);box-shadow:inset 0 0 0 1.5px rgba(232,113,74,.6);}
   .order-anchor .anc-badge .ic{width:20px;height:20px;stroke-width:2.4;color:#F2A07E;}
+
+  /* v30 */
+  body.music-waiting .mus-btn{box-shadow:inset 0 0 0 1px var(--hair),0 0 0 0 rgba(242,194,83,.5);}
+  .round-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .round-row .round-pill{margin:0;}
+  .round-row .history-dots{margin:0;}
+  #app > h2.think-head{margin:4px 0 0;}
+  #app > h2.think-head::after{display:none;}
+  .think-timer{margin:14px auto 22px;}
+  .think-beads{margin:0 0 28px;}
+  .lives{margin:4px 0 10px;}
+  .result-banner{margin-bottom:14px;}
+  .result-banner.cleared{display:none;}
+  .order-card.deal{margin-bottom:18px;}
+  .thread-wrap{margin-bottom:18px;}
+  .tok-next .eye-ic{width:24px;height:24px;}
+  @media (prefers-reduced-motion:no-preference){
+    body.music-waiting .mus-btn{animation:musPulse 1.8s ease-in-out infinite;}
+    .tok-next .eye-lid{transform-box:fill-box;transform-origin:center;animation:eyeBlink 3.2s ease-in-out infinite;}
+    .tok-next .eye-ic{animation:eyePeek 3.2s ease-in-out infinite;}
+  }
+  @keyframes musPulse{0%,100%{box-shadow:inset 0 0 0 1px var(--hair),0 0 0 0 rgba(242,194,83,.55);}60%{box-shadow:inset 0 0 0 1px var(--hair),0 0 0 9px rgba(242,194,83,0);}}
+  @keyframes eyeBlink{0%,40%,48%,100%{transform:scaleY(1);}44%{transform:scaleY(.08);}}
+  @keyframes eyePeek{0%,60%,100%{transform:translateX(0);}70%{transform:translateX(-2px);}82%{transform:translateX(2px);}}
 </style>
 </head>
 <body>
@@ -839,7 +863,7 @@ const STRINGS = {
     noClueText:"(答えなし)",
     successBannerText:"つながった!", failBannerText:"おしい!",
     connectorOkText:"つながった", connectorBadText:"ここで切れた",
-    playAgainBtn:"もう一度プレイ", waitingNextRoundText:"ホストが次のラウンドを準備しています…",
+    playAgainBtn:"次のラウンド", waitingNextRoundText:"ホストが次のラウンドを準備しています…",
     changeTopicBtn:"お題の決め方を変更",
     localSetupHeading:"1台で遊ぶ",
     localSetupSubtitle:"デバイスを順番に<wbr>回して遊びます。",
@@ -916,7 +940,7 @@ const STRINGS = {
     noClueText:"(no response)",
     successBannerText:"It holds!", failBannerText:"Not quite",
     connectorOkText:"Connected", connectorBadText:"Snapped here",
-    playAgainBtn:"Play again", waitingNextRoundText:"The host is setting up the next round…",
+    playAgainBtn:"Next round", waitingNextRoundText:"The host is setting up the next round…",
     changeTopicBtn:"Change Topic Settings",
     localSetupHeading:"Local Play",
     localSetupSubtitle:"Pass one device around.",
@@ -1504,10 +1528,14 @@ function playFailSound(){
 // Buttons that already trigger a more distinct sound of their own (round
 // start, success/fail) simply layer a quick tap before that sound, which
 // reads as "press acknowledged, then payoff" rather than a glitchy repeat.
-document.addEventListener('click', (e)=>{
-  // Browsers only allow audio after a tap, so the first tap anywhere starts the music.
-  musicUnlocked = true;
+// Browsers only allow audio after a tap, so the first tap or key press anywhere starts the music.
+function unlockMusicNow(){
+  musicUnlocked = true; document.body.classList.remove('music-waiting');
   if(musicEnabled && !musicPlaying) startMusic();
+}
+['pointerdown','touchend','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ if(!musicUnlocked) unlockMusicNow(); }, {passive:true}));
+document.addEventListener('click', (e)=>{
+  unlockMusicNow();
   if(!soundEnabled) return;
   const el = e.target.closest('button');
   if(!el || el.disabled) return;
@@ -1625,7 +1653,7 @@ function scheduleMusicBar(ctx,g,idx,t0){
 }
 // How the music feels in each part of a round: [volume, brightness]. Quiet and soft while people think and talk,
 // opening up for the reveal, with a bright lift on a win and a softer landing when the thread snaps.
-const MUSIC_MOODS = {duck:[0.06,900], timer:[0.32,1800], lobby:[1,18000], think:[0.6,2800], order:[0.5,2400], reveal:[0.85,9000], win:[1,18000], lose:[0.65,2600]};
+const MUSIC_MOODS = {duck:[0.06,900], timer:[0,1800], lobby:[1,18000], think:[0.6,2800], order:[0.5,2400], reveal:[0.85,9000], win:[1,18000], lose:[0.65,2600]};
 let musicMood='lobby', musicGuestMuted=false;
 function moodNow(){
   const done=(n,rev,res)=> revealedCount(rev,n)>=n && res;
@@ -2141,8 +2169,11 @@ function hostNextRound(){
   if(!isHost())return;
   const fin = room.phase==='reveal' && room.lastResult && room.order && revealedCount(room.revealed,room.order.length)>=room.order.length;
   const gs=nextGameState({livesStart:room.livesStart, cleared:room.cleared}, room.players, room.order||[], !!fin);
+  const newGame = fin && livesNow({livesStart:room.livesStart}, room.players, room.order, room.order.length)<=0;
   room.livesStart=gs.livesStart; room.cleared=gs.cleared;
-  safeWrite(()=>update(roomRef(room.code), {livesStart:gs.livesStart, cleared:gs.cleared}));
+  const gu={livesStart:gs.livesStart, cleared:gs.cleared};
+  if(newGame){ room.round=0; room.history=[]; gu.round=0; gu.history=[]; }   // new game: back to round 1
+  safeWrite(()=>update(roomRef(room.code), gu));
   room.phase='lobby';
   room.lastResult=null; render();
   safeWrite(()=>update(roomRef(room.code), {phase:'lobby', lastResult:null, revealed:null}));
@@ -2200,6 +2231,7 @@ function beginLocalRound(){
   const ids=Object.keys(local.players);
   const fin = local.phase==='reveal' && local.lastResult && revealedCount(local.revealed,(local.order||[]).length)>=(local.order||[]).length;
   const gs=nextGameState({livesStart:local.livesStart, cleared:local.cleared}, local.players, local.order||[], !!fin);
+  if(fin && livesNow({livesStart:local.livesStart}, local.players, local.order, local.order.length)<=0){ local.round=0; local.history=[]; }   // new game: back to round 1
   local.livesStart=gs.livesStart; local.cleared=gs.cleared;
   let topic=local.pendingTopic;
   if(local.topicMode==='presetRandom' || !topic){
@@ -2484,8 +2516,7 @@ function revealProgressText(a,b){ return currentLang()==='en' ? ('Revealed '+a+'
 
 function renderOrderAndReveal(playersObj, order, topic, phase, round, history, hostAllowed, cb, revealed, game){
   let html='';
-  html += renderHistoryDots(history);
-  html += `<div class="round-pill">${roundLabel(round)}</div>`;
+  html += `<div class="round-row"><div class="round-pill">${roundLabel(round)}</div>${renderHistoryDots(history)}</div>`;
   html += topicBannerHTML(topic);
   html += renderErrorBanner();
 
@@ -2501,7 +2532,7 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     } else if(success){
       html += `<div class="result-banner success${once}"><div class="res-line">${icon('check')}<div class="big">${esc(pickLine(WIN_LINES,lineKey))}</div></div>${once?confettiHTML():''}</div>`;
     } else {
-      html += `<div class="result-banner cleared${once}"><div class="res-line"><div class="big">${t('roundClearedText')}</div></div></div>`;
+      html += `<div class="result-banner cleared${once}"></div>`;
     }
   } else if(over){
     html += `<div class="out-lives${fx(lkey+':out','fresh',1200)}"><div class="big">${t('outOfLivesText')}</div></div>`;
@@ -2524,7 +2555,7 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     }
     const tok = shown
       ? `<span class="tok" style="--c:${playerColor(id,playersObj)}">${p.number}</span>`
-      : (isNext ? `<button type="button" class="tok tok-next" onclick="${cb.revealNext}()" aria-label="${esc(t('revealNextBtn'))}">${icon('flip')}</button>` : '');
+      : (isNext ? `<button type="button" class="tok tok-next" onclick="${cb.revealNext}()" aria-label="${esc(t('revealNextBtn'))}"><svg class="ic eye-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="eye-lid"><path d="M2.6 12S6 5.6 12 5.6 21.4 12 21.4 12 18 18.4 12 18.4 2.6 12 2.6 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></g></svg></button>` : '');
     const ctr = canMove ? `<div class="order-controls">
         <button aria-label="${esc(t('moveUpLabel'))}" onclick="${cb.move}(${idx},1)" ${idx===n-1?'disabled':''}>${icon('chev-up')}</button>
         <button aria-label="${esc(t('moveDownLabel'))}" onclick="${cb.move}(${idx},-1)" ${idx===rev?'disabled':''}>${icon('chev-down')}</button>
@@ -2594,7 +2625,7 @@ function evHeartsSVG(before, after){
   return `<svg class="ev-hearts" viewBox="0 0 300 200" role="img" aria-label="${esc(t('lifeLostAria'))}"><defs><clipPath id="evL"><polygon points="-40,-40 2,-40 -5,-14 5,0 -4,12 0,30 -40,30"/></clipPath><clipPath id="evR"><polygon points="2,-40 40,-40 40,30 0,30 -4,12 5,0 -5,-14"/></clipPath></defs><path class="ev-thread" d="M14 22Q150 30 286 22"/>${g}</svg>`;
 }
 function evRoundStart(round, topic){ return `<div class="ev ev-start"><div class="ev-kicker">${esc(roundLabel(round))}</div><div class="ev-topic">${esc(topic.text)}</div></div>`; }
-function evCleared(players, order, lives){ return `<div class="ev ev-clear"><div class="ev-beads">${order.slice().reverse().map((id,i)=>beadHTML(id,players,'lg ev-jump',`--j:${i*0.08}s`)).join('')}</div><div class="ev-big">${t('roundClearedText')}</div>${livesHTML(lives)}</div>`; }
+function evCleared(players, order, lives, line){ return `<div class="ev ev-clear"><div class="ev-beads">${order.slice().reverse().map((id,i)=>beadHTML(id,players,'xl ev-jump',`--j:${i*0.08}s`)).join('')}</div>${line?`<div class="ev-big">${esc(line)}</div>`:''}${livesHTML(lives)}</div>`; }
 function evGameOver(){ return `<div class="ev ev-over"><div class="ev-big ev-over-word">${t('gameOverText')}</div><svg class="ev-cut" viewBox="0 0 300 40" aria-hidden="true"><path class="ev-cut-l" d="M0 20Q75 14 150 20"/><path class="ev-cut-r" d="M150 20Q225 26 300 20"/></svg></div>`; }
 function evOut(host, cb){ return `<div class="ev ev-out" role="dialog" aria-modal="true"><div class="ev-big">${t('outOfLivesText')}</div>${livesHTML(0)}${host?`<button class="btn btn-primary" onclick="closeEvent();${cb.next}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" onclick="closeEvent();${cb.end}()">${t('endGameBtn')}</button>`:`<div class="helper">${t('waitHostText')}</div>`}</div>`; }
 function checkEvents(){
@@ -2607,7 +2638,7 @@ function checkEvents(){
   if(c.phase!=='reveal') return;
   const n=c.order.length, rev=revealedCount(c.rev,n), st=(c.g.livesStart!=null?c.g.livesStart:LIVES), lives=livesNow(c.g,c.players,c.order,rev), done=rev>=n && !!c.lr;
   for(let l=st-1; l>=lives; l--) queueEvent(key+':life:'+l, ()=>`<div class="ev ev-life">${evHeartsSVG(l+1,l)}</div>`, 2100, ()=>{ SFX.snip(0.5); SFX.thud(1.55); SFX.uhoh(1.75); });
-  if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives), 1800, ()=>SFX.jingle(0.2));
+  if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives, orderIsCorrect(c.players,c.order)?pickLine(WIN_LINES,c.round+':'+c.topic.text):''), 1800, ()=>SFX.jingle(0.2));
   if(done && lives<=0) queueEvent(key+':over', evGameOver, 2200, ()=>{ SFX.snip(0.55); SFX.falling(0.8); duckMusic(2600); });
   if(!done && lives<=0) queueEvent(key+':out', ()=>evOut(c.host,c.cb), 0);
 }
@@ -2689,6 +2720,7 @@ function render(){
   if(mode==='help') revealHelpSteps();
   if(document.getElementById('think-timer')) ensureTimerLoop();
   checkEvents();
+  document.body.classList.toggle('music-waiting', musicEnabled && !musicUnlocked);
   tiltReset();
   updateMusicMood();
 }
@@ -2890,8 +2922,7 @@ function renderOnlineMode(){
     const me=room.players[myId];
     const activeIds = room.order || [];
     const amActive = activeIds.includes(myId);
-    html += renderHistoryDots(room.history);
-    html += `<div class="round-pill">${roundLabel(room.round)}</div>`;
+    html += `<div class="round-row"><div class="round-pill">${roundLabel(room.round)}</div>${renderHistoryDots(room.history)}</div>`;
     html += topicBannerHTML(room.topic);
     if(!amActive){
       html += `<div class="card" style="text-align:center;padding:24px 18px;">
