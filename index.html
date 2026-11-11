@@ -654,6 +654,81 @@
   @keyframes landPop{0%{transform:scale(1);}50%{transform:scale(1.12);}100%{transform:scale(1);}}
   @keyframes dizzy{0%{transform:rotate(0);}60%{transform:rotate(380deg);}80%{transform:rotate(350deg);}100%{transform:rotate(360deg);}}
   @keyframes sweat{0%{opacity:0;transform:translateY(-2px);}25%{opacity:1;}100%{opacity:0;transform:translateY(14px);}}
+
+  /* v28: spacing, fewer boxes, event screens, hearts */
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .shell > .topic-banner{margin-bottom:24px;}
+  .shell > .btn{margin-top:12px;}
+  .shell > .round-pill{margin-bottom:14px;}
+  .thread-wrap{padding-left:0;margin-top:10px;margin-bottom:12px;}
+  .thread-wrap::before{display:none;}
+  .thread-wrap .order-card::before{display:none;}
+  .order-card.deal{margin-bottom:14px;}
+  .pass-stage{display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(24px,7vh,64px) 0 12px;}
+  .bead.xxl{width:112px;height:112px;font-size:44px;}
+  .pass-bead{margin:0 0 22px;}
+  .pass-up{font-size:15px;color:rgba(255,250,242,.65);margin-bottom:6px;}
+  .pass-name{font-family:var(--display);font-size:30px;font-weight:700;color:var(--white);margin-bottom:28px;}
+  .pass-stage .btn{align-self:stretch;}
+  .number-btn.card{background:transparent;box-shadow:none;border:0;color:var(--white);padding:18px 0 22px;margin-bottom:12px;}
+  .number-btn .lab{color:rgba(255,250,242,.7);font-size:15px;}
+  .number-btn .num-body{display:grid;place-items:center;}
+  .number-btn .number-display{display:grid;place-items:center;width:170px;height:170px;margin:12px auto 6px;border-radius:50%;background:radial-gradient(circle,rgba(255,250,242,.10),rgba(255,250,242,0) 70%);box-shadow:inset 0 0 0 2px rgba(255,250,242,.16),0 0 60px -10px rgba(242,194,83,.35);color:var(--white);font-size:72px;}
+  .number-btn .number-hidden{opacity:1;color:rgba(255,250,242,.5);font-size:40px;letter-spacing:4px;}
+  .number-btn .num-hint{color:rgba(255,250,242,.65);display:flex;align-items:center;justify-content:center;gap:6px;min-height:22px;}
+  .num-hint .ic{width:20px;height:20px;}
+  .lives{gap:14px;margin:0 0 16px;}
+  .life{width:auto;height:auto;}
+  .hrt{width:44px;height:40px;display:block;overflow:visible;}
+  .life.on .hrt path{fill:#F07B7B;stroke:#C9555A;stroke-width:3;}
+  .life.off .hrt path{fill:none;stroke:rgba(255,255,255,.25);stroke-width:3;stroke-dasharray:5 5;}
+  .event-ov{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:rgba(20,22,48,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+  .ev{width:100%;max-width:360px;text-align:center;color:var(--white);display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .ev-big{font-family:var(--display);font-weight:700;font-size:34px;line-height:1.15;}
+  .ev-kicker{font-family:var(--display);font-weight:700;font-size:20px;color:var(--mustard);letter-spacing:.04em;}
+  .ev-topic{background:linear-gradient(145deg,#F3C556,#E8B339 55%,#DDA42D);color:#2B2440;border-radius:24px;padding:22px 24px;font-family:var(--display);font-weight:700;font-size:24px;box-shadow:0 24px 46px -26px rgba(232,179,57,.8);}
+  .ev-hearts{width:min(320px,86vw);height:auto;overflow:visible;}
+  .ev-hearts line,.ev-thread{stroke:#EDE6D6;stroke-width:2.2;stroke-linecap:round;fill:none;}
+  .ev-hearts .ev-gone{stroke:rgba(237,230,214,.35);}
+  .ev-hf{fill:#F07B7B;stroke:#C9555A;stroke-width:3;}
+  .ev-snip path{stroke:#ff9d96;stroke-width:3;stroke-linecap:round;opacity:0;}
+  .ev-beads{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .ev-over-word{font-size:46px;letter-spacing:.02em;color:#ffd5d1;}
+  .ev-cut{width:260px;height:30px;overflow:visible;} .ev-cut path{stroke:#EDE6D6;stroke-width:2.5;fill:none;stroke-linecap:round;}
+  .ev-out .btn{align-self:stretch;}
+  .ev-time .ev-big{font-size:40px;color:var(--mustard);}
+  @media (prefers-reduced-motion:no-preference){
+    .event-ov{animation:evIn .22s ease-out both;} .event-ov.out{animation:evOut .2s ease-in both;}
+    .event-ov .ev{animation:evPop .45s cubic-bezier(.3,1.5,.5,1) both;}
+    .ev-topic{animation:dealIn .7s cubic-bezier(.3,1.3,.5,1) .25s both;}
+    .ev-swing{transform-box:view-box;transform-origin:50% 11%;animation:evSwing 1.4s ease-in-out calc(.75s + var(--d,0s)) both;}
+    .ev-swing{transform-origin:center 22px;}
+    .ev-snip path{animation:evSnip .5s ease-out .5s both;}
+    .ev-fall{animation:evFall 1.1s cubic-bezier(.5,0,.9,.5) .62s both;}
+    .ev-half{transform-box:fill-box;}
+    .ev-half.l{transform-origin:100% 100%;animation:evCrackL .5s ease-out 1.35s both;}
+    .ev-half.r{transform-origin:0% 100%;animation:evCrackR .5s ease-out 1.35s both;}
+    .ev-jump{animation:hop .55s cubic-bezier(.3,1.6,.5,1) calc(.25s + var(--j,0s)) 2 both;}
+    .ev-cut-l{animation:cutL .9s ease-in .55s both;transform-box:fill-box;transform-origin:0 50%;}
+    .ev-cut-r{animation:cutR .9s ease-in .55s both;transform-box:fill-box;transform-origin:100% 50%;}
+    .ev-time .ev-big{animation:landPop .5s cubic-bezier(.3,1.6,.5,1) .1s both;}
+  }
+  @keyframes evIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes evOut{from{opacity:1;}to{opacity:0;}}
+  @keyframes evPop{from{opacity:0;transform:scale(.9) translateY(10px);}to{opacity:1;transform:none;}}
+  @keyframes evSwing{0%{transform:rotate(0);}20%{transform:rotate(4deg);}45%{transform:rotate(-3deg);}70%{transform:rotate(1.5deg);}100%{transform:rotate(0);}}
+  @keyframes evSnip{0%{opacity:0;transform:scale(.4);}40%{opacity:1;transform:scale(1.2);}100%{opacity:0;transform:scale(1);}}
+  @keyframes evFall{0%{transform:translateY(0);}100%{transform:translateY(70px);}}
+  @keyframes evCrackL{to{transform:translate(-8px,6px) rotate(-14deg);}}
+  @keyframes evCrackR{to{transform:translate(8px,6px) rotate(14deg);}}
+  @keyframes cutL{0%{transform:none;}100%{transform:rotate(16deg) translateY(4px);opacity:.6;}}
+  @keyframes cutR{0%{transform:none;}100%{transform:rotate(-16deg) translateY(4px);opacity:.6;}}
+
+  /* v29: High / Low labels */
+  .order-anchor{justify-content:flex-start;padding:6px 4px;}
+  .order-anchor .anchor-label{gap:10px;font-family:var(--display);font-size:18px;font-weight:700;color:var(--white);}
+  .anc-badge{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(232,113,74,.16);box-shadow:inset 0 0 0 1.5px rgba(232,113,74,.6);}
+  .order-anchor .anc-badge .ic{width:20px;height:20px;stroke-width:2.4;color:#F2A07E;}
 </style>
 </head>
 <body>
@@ -756,7 +831,7 @@ const STRINGS = {
     spectatorJoinedText:"今回のラウンドはもう始まっています。次のラウンドから参加できます！",
     spectatorWatchingText:"このラウンドは観戦中です。次のラウンドから参加できます。",
     orderInstructions:"答えを見ながら、大きい数を上、小さい数を下に並べよう。下から1枚ずつめくって、めくるたびに並べ直せます。",
-    orderLowLabel:"小さい数", orderHighLabel:"大きい数", moveUpLabel:"上へ", moveDownLabel:"下へ",
+    orderLowLabel:"小", orderHighLabel:"大", moveUpLabel:"上へ", moveDownLabel:"下へ",
     btnHelp:"遊び方", helpHeading:"遊び方",
     pledgeAria:"ito 3つの誓いを開く", backBtn:"もどる",
     judgeBtn:"いちばん下をめくる", waitingHostJudgeText:"ホストがめくります。みんなで相談して並べてね。",
@@ -770,8 +845,8 @@ const STRINGS = {
     localSetupSubtitle:"デバイスを順番に<wbr>回して遊びます。",
     playerCountLabel:"人数", startLocalBtn:"はじめる",
     nextTurnLabel:"次の番", passInstructions:"画面をこの人に渡してください。準備ができたらタップ。",
-    revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次の人へ渡す",
-    tapToReveal:"タップして表示", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"隠して次の人へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
+    revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次へ",
+    tapToReveal:"タップして表示", lifeLostAria:"ライフを1つ失った", waitHostText:"ホストの選択を待っています", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"次へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
     retopicHeading:"次のお題を決める", thisTopicStartBtn:"このお題で始める",
     bankHeading:"お題バンク",
     bankIntro:"みんなで作るお題集。気に入ったら、ゲーム中の「みんな」からも選べます。",
@@ -833,7 +908,7 @@ const STRINGS = {
     spectatorJoinedText:"This round already started. You'll be included starting next round!",
     spectatorWatchingText:"You're spectating this round. You'll join starting next round.",
     orderInstructions:"Arrange the responses: highest number on top, lowest at the bottom. Flip from the bottom up, and rearrange after each flip.",
-    orderLowLabel:"Lowest number", orderHighLabel:"Highest number", moveUpLabel:"Move up", moveDownLabel:"Move down",
+    orderLowLabel:"Low", orderHighLabel:"High", moveUpLabel:"Move up", moveDownLabel:"Move down",
     btnHelp:"How to Play", helpHeading:"How to Play",
     pledgeAria:"Open ito's three pledges", backBtn:"Back",
     judgeBtn:"Flip the lowest card", waitingHostJudgeText:"The host will reveal. Talk it through and arrange together.",
@@ -847,8 +922,8 @@ const STRINGS = {
     localSetupSubtitle:"Pass one device around.",
     playerCountLabel:"Number of players", startLocalBtn:"Start",
     nextTurnLabel:"Up next", passInstructions:"Hand the device to this person. Tap when ready.",
-    revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm & pass to next player",
-    tapToReveal:"Tap to reveal", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Hide and pass", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
+    revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm and next",
+    tapToReveal:"Tap to reveal", lifeLostAria:"Lost a life", waitHostText:"Waiting for the host", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Next", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
     retopicHeading:"Choose the next topic", thisTopicStartBtn:"Start with this topic",
     bankHeading:"Topic bank",
     bankIntro:"A topic collection built together. Pick these in-game under “Community.”",
@@ -1116,6 +1191,7 @@ const ICONS = {
   'help':'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.6a2.6 2.6 0 1 1 3.7 2.4c-.9.5-1.2 1-1.2 1.9"/><path d="M12 17.1h.01"/>',
   'book':'<path d="M3.8 5.6c2.8-1.1 5.5-.8 8.2 1.1 2.7-1.9 5.4-2.2 8.2-1.1v12.2c-2.8-1.1-5.5-.8-8.2 1.1-2.7-1.9-5.4-2.2-8.2-1.1z"/><path d="M12 6.7v12.2"/>',
   'chev-right':'<path d="M9.5 5.5L16 12l-6.5 6.5"/>', 'chev-left':'<path d="M14.5 5.5L8 12l6.5 6.5"/>',
+  'arrow-up':'<path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/>', 'arrow-down':'<path d="M12 5v14M5.5 12.5 12 19l6.5-6.5"/>',
   'flip':'<rect x="8" y="3.5" width="9" height="13" rx="2"/><path d="M4.5 12.5a7.5 7.5 0 0 0 8.5 7.6"/><path d="M10.6 18.4l2.6 1.8-2 2.3"/>',
   'heart':'<path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
   'clock':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 3h5"/>',
@@ -1373,6 +1449,31 @@ function playTone(freq, startOffset, duration, waveform, peakGain){
   osc.start(t0);
   osc.stop(t0 + duration + 0.03);
 }
+// Short game sounds made in code (no files). All follow the sound button.
+function noiseBurst(dur, f0, f1, peak, delay){
+  if(!soundEnabled) return;
+  const ctx=ensureAudioCtx(); if(!ctx || !ctx.createBufferSource || !ctx.createBiquadFilter) return;
+  const len=Math.max(1,Math.floor((ctx.sampleRate||44100)*dur)), buf=ctx.createBuffer(1,len,ctx.sampleRate||44100), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+  const src=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain(), t0=ctx.currentTime+(delay||0);
+  src.buffer=buf; f.type='bandpass'; f.Q.value=1.2;
+  f.frequency.setValueAtTime(f0,t0); f.frequency.exponentialRampToValueAtTime(f1,t0+dur);
+  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(peak,t0+dur*0.35); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  src.connect(f); f.connect(g); g.connect(ctx.destination); src.start(t0); src.stop(t0+dur+0.02);
+}
+const SFX={
+  whoosh(){ noiseBurst(0.32, 500, 2600, 0.07); },
+  thud(at){ playTone(110, at||0, 0.18, 'sine', 0.14); playTone(220, (at||0)+0.005, 0.08, 'triangle', 0.05); },
+  snip(at){ noiseBurst(0.06, 5000, 7000, 0.12, at||0); playTone(2400, at||0, 0.04, 'square', 0.025); },
+  uhoh(at){ playTone(329.63, at||0, 0.22, 'triangle', 0.1); playTone(261.63, (at||0)+0.22, 0.38, 'triangle', 0.1); },
+  jingle(at){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>playTone(f,(at||0)+i*0.11,0.3,'sine',0.12)); },
+  falling(at){ [392,329.63,261.63].forEach((f,i)=>playTone(f,(at||0)+i*0.32,0.5,'triangle',0.11)); },
+  ding(){ playTone(1318.5,0,0.35,'sine',0.08); },
+  swish(){ noiseBurst(0.16, 1800, 700, 0.045); },
+};
+// Game over: the music steps away for a moment.
+let musicDuckUntil=0;
+function duckMusic(ms){ musicDuckUntil=Date.now()+ms; updateMusicMood(); setTimeout(updateMusicMood, ms+50); }
 function playRoundStartSound(){
   playTone(523.25, 0,    0.16, 'sine', 0.14); // C5
   playTone(659.25, 0.09, 0.20, 'sine', 0.12); // E5
@@ -1524,10 +1625,11 @@ function scheduleMusicBar(ctx,g,idx,t0){
 }
 // How the music feels in each part of a round: [volume, brightness]. Quiet and soft while people think and talk,
 // opening up for the reveal, with a bright lift on a win and a softer landing when the thread snaps.
-const MUSIC_MOODS = {timer:[0.32,1800], lobby:[1,18000], think:[0.6,2800], order:[0.5,2400], reveal:[0.85,9000], win:[1,18000], lose:[0.65,2600]};
+const MUSIC_MOODS = {duck:[0.06,900], timer:[0.32,1800], lobby:[1,18000], think:[0.6,2800], order:[0.5,2400], reveal:[0.85,9000], win:[1,18000], lose:[0.65,2600]};
 let musicMood='lobby', musicGuestMuted=false;
 function moodNow(){
   const done=(n,rev,res)=> revealedCount(rev,n)>=n && res;
+  if(Date.now()<musicDuckUntil) return 'duck';
   if(timerActive()) return 'timer';    // the game music steps back so the countdown track leads
   if(mode==='online' && onlineStep==='room' && room){
     const p=room.phase; if(p==='clue') return 'think'; if(p==='order') return 'order';
@@ -1708,7 +1810,7 @@ function attachRoomListener(code){
       if(prevPhase !== 'clue' && val.phase === 'clue'){
         playRoundStartSound();
       } else if(val.phase === 'reveal'){
-        const finale=()=>{ const ok = val.lastResult ? !!val.lastResult.success : orderIsCorrect(val.players,val.order); setTimeout(()=>{ if(ok) playSuccessSound(); else playFailSound(); },380); };
+        const finale=()=>{ const ok = val.lastResult ? !!val.lastResult.success : orderIsCorrect(val.players,val.order); };
         if(prevPhase !== 'reveal'){
           if(lastKnownRevealed >= nOrder) finale();   // older room: everything was already face up
         } else if(prevRev !== null && lastKnownRevealed > prevRev){
@@ -2117,10 +2219,13 @@ function beginLocalRound(){
 }
 let localNumberShown=false;   // the number is hidden by default on each player's hint screen
 function localRevealOwnNumber(){ local.phase='pass-show'; localNumberShown=false; render(); }
-function numberBodyHTML(num, shown){
+// The hint words show only when they help (first player of the first round in Local, always Online); otherwise just an eye icon.
+function localHint(){ return !!(local && local.round===1 && local.passIdx===0); }
+function numberBodyHTML(num, shown, hint){
+  if(hint===undefined) hint=true;
   return shown
-    ? `<div class="number-display">${num}</div><div class="num-hint">${t('tapToHide')}</div>`
-    : `<div class="number-display number-hidden">•••</div><div class="num-hint">${t('tapToReveal')}</div>`;
+    ? `<div class="number-display">${num}</div><div class="num-hint">${hint?t('tapToHide'):''}</div>`
+    : `<div class="number-display number-hidden">•••</div><div class="num-hint">${icon('eye')}${hint?`<span>${t('tapToReveal')}</span>`:''}</div>`;
 }
 // Toggles in place (no re-render) so whatever the player has typed in the hint box is kept.
 // Your number rolls up quickly and lands on the real one (a little slot-machine moment).
@@ -2131,7 +2236,7 @@ function countUp(el, n){
     if(!el.isConnected) return;
     const k=Math.min(1,(now-t0)/dur), v=Math.max(1,Math.round(n*(1-Math.pow(1-k,3))));
     if(v!==last){ el.textContent=v; if(v-last>=Math.max(1,n/10)||k===1){ playTone(900+v*4,0,0.03,'sine',0.04); } last=v; }
-    if(k<1) requestAnimationFrame(step); else { el.textContent=n; el.classList.add('landed'); }
+    if(k<1) requestAnimationFrame(step); else { el.textContent=n; el.classList.add('landed'); SFX.ding(); }
   };
   el.textContent='1'; requestAnimationFrame(step);
   setTimeout(()=>{ if(el.isConnected && el.textContent!==String(n)){ el.textContent=n; el.classList.add('landed'); } }, dur+120);   // lands even if frames stall
@@ -2142,7 +2247,7 @@ function toggleLocalNumber(){
   const p=local.players[ids[local.passIdx]]; if(!p) return;
   localNumberShown=!localNumberShown;
   el.setAttribute('aria-pressed', localNumberShown?'true':'false');
-  el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown);
+  el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown, localHint());
   if(localNumberShown) countUp(el.querySelector('.number-display'), p.number);
 }
 // Online answer screen: tap the card to hide or show your number, in place so typed text stays.
@@ -2202,7 +2307,6 @@ function localRevealNext(){
   if(next===n){
     const success=orderIsCorrect(local.players,o);
     local.lastResult={success}; local.history=(local.history||[]).concat([success]);
-    setTimeout(()=>{ if(success) playSuccessSound(); else playFailSound(); },380);
   }
   render();
 }
@@ -2212,7 +2316,7 @@ function localEndGame(){
   if(!local || local.phase!=='reveal') return;
   const o=local.order; local.revealed=o.length;
   const success=orderIsCorrect(local.players,o); local.lastResult={success}; local.history=(local.history||[]).concat([success]);
-  playFailSound(); render();
+  render();
 }
 function localSetTopicMode(m){
   local.topicMode=m; local.pendingTopic=null;
@@ -2256,6 +2360,7 @@ function slideRender(){
   document.querySelectorAll('.order-card[data-id]').forEach(el=>{
     const b=before[el.dataset.id]; if(b==null || typeof el.animate!=='function') return;
     const dy=b-el.getBoundingClientRect().top; if(Math.abs(dy)<2) return;
+    if(!el.parentNode._sw){ el.parentNode._sw=1; SFX.swish(); }
     el.animate([{translate:'0 '+dy+'px'},{translate:'0 0'}],{duration:260, easing:'cubic-bezier(.2,.8,.2,1)', composite:'add'});
   });
 }
@@ -2365,11 +2470,12 @@ function roundsClearedText(n){ return currentLang()==='en' ? (n+(n===1?' round c
 const WIN_LINES={en:['Bang bang!','Yee-haw!','Nailed it!','Mind readers!','Tied tight!'], ja:['ビンゴ!','完璧!','以心伝心!','天才か!','つながった!']};
 const MISS_LINES={en:['Better luck next time','Do better','Not good enough','Yikes','Who said that?'], ja:['次こそ!','出直してこい','まだまだ!','誰だ今の','あーあ']};
 function pickLine(set, key){ const a=set[currentLang()==='ja'?'ja':'en']; return a[hashStr(key)%a.length]; }
-function livesHTML(lives, start, key){
+function heartSVG(cls){ return `<svg class="hrt${cls?' '+cls:''}" viewBox="-40 -40 80 70" aria-hidden="true"><path d="${HEART_D}"/></svg>`; }
+const HEART_D='M0 24C-30 4-36-14-30-24-24-34-8-34 0-22 8-34 24-34 30-24 36-14 30 4 0 24Z';
+function livesHTML(lives){
   let h=`<div class="lives" role="img" aria-label="${esc(currentLang()==='en'?('Lives: '+lives+' of '+LIVES):('ライフ '+lives+'/'+LIVES))}">`;
-  const lost=lives<start, fresh=lost && !!fx(key+':lost:'+lives,'x',1400);   // a heart breaks only when it is lost this round
-  for(let i=0;i<LIVES;i++) h+=`<span class="life${i<lives?' on':' off'}${fresh&&i===lives?' breaking':''}">${icon('heart')}</span>`;
-  return h+'</div>'+(fresh?'<div class="life-flash" aria-hidden="true"></div>':'');
+  for(let i=0;i<LIVES;i++) h+=`<span class="life${i<lives?' on':' off'}">${heartSVG()}</span>`;
+  return h+'</div>';
 }
 function orderIsCorrect(players, order){ return order.every((id,i)=> i===order.length-1 || players[id].number < players[order[i+1]].number); }
 // How many cards are face up. A missing value (older rooms) means everything is already revealed.
@@ -2387,32 +2493,30 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
   const success = done ? orderIsCorrect(playersObj,order) : null;
   const fxk = cb.revealNext+':'+round+':'+rev;      // one-off effects belong to this exact flip
   const g=game||{}, lives=livesNow(g, playersObj, order, rev), over=lives<=0, lkey=cb.revealNext+':'+round;
-  html += livesHTML(lives, (g.livesStart!=null?g.livesStart:LIVES), lkey);
+  html += livesHTML(lives);
   if(done){
     const once=fx(cb.revealNext+':result:'+round,'fresh',1800), lineKey=round+':'+topic.text;
     if(over){
-      html += `<div class="result-banner fail over${once}"><div class="res-line"><div class="big">${t('gameOverText')}</div></div><div class="res-sub">${esc(pickLine(MISS_LINES,lineKey))} · ${esc(roundsClearedText(g.cleared||0))}</div>${resultThreadHTML(false)}</div>`;
+      html += `<div class="result-banner fail over${once}"><div class="res-line"><div class="big">${t('gameOverText')}</div></div></div>`;
     } else if(success){
-      html += `<div class="result-banner success${once}"><div class="res-line">${icon('check')}<div class="big">${esc(pickLine(WIN_LINES,lineKey))}</div></div><div class="res-sub">${t('roundClearedText')} · ${esc(livesLeftText(lives))}</div>${resultThreadHTML(true)}${once?confettiHTML():''}</div>`;
+      html += `<div class="result-banner success${once}"><div class="res-line">${icon('check')}<div class="big">${esc(pickLine(WIN_LINES,lineKey))}</div></div>${once?confettiHTML():''}</div>`;
     } else {
-      html += `<div class="result-banner cleared${once}"><div class="res-line"><div class="big">${t('roundClearedText')}</div><span class="res-lives">· ${esc(livesLeftText(lives))}</span></div>${resultThreadHTML(true)}</div>`;
+      html += `<div class="result-banner cleared${once}"><div class="res-line"><div class="big">${t('roundClearedText')}</div></div></div>`;
     }
   } else if(over){
     html += `<div class="out-lives${fx(lkey+':out','fresh',1200)}"><div class="big">${t('outOfLivesText')}</div></div>`;
   } else if(rev===0){
-    html += `<p class="subtitle">${t('orderInstructions')}</p>`;
   } else {
     html += `<div class="reveal-progress">${revealProgressText(rev,n)}</div>`;
   }
-  if(!done) html += `<div class="order-anchor order-anchor-top"><span class="anchor-label">${icon('chev-up')}${t('orderHighLabel')}</span><span class="anchor-end">${esc(topic.high)}</span></div>`;
+  if(!done) html += `<div class="order-anchor order-anchor-top"><span class="anchor-label"><span class="anc-badge">${icon('arrow-up')}</span>${t('orderHighLabel')}</span></div>`;
   html += `<div class="thread-wrap${done?((success||!over)?' win':' lose'):''}${done&&(success||!over)?fx(lkey+':wave','wave',2600):''}">`;
-  if(done && success) html += sparksHTML();
   for(let idx=n-1; idx>=0; idx--){         // top of the screen is the highest spot (the array runs lowest to highest)
     const id=order[idx], p=playersObj[id], shown=idx<rev, isNext=(idx===rev && !done && hostAllowed), canMove=!done && idx>=rev;
     let link='', cardFx='';
     if(idx>0 && idx<rev){                  // thread down to the card below
       const ok = playersObj[order[idx-1]].number < p.number;
-      link=`<span class="link ${ok?'ok':'bad'}${idx===rev-1?fx(fxk+':link','fresh',2200):''}" aria-hidden="true"></span>`;
+      link='';
     }
     if(idx===rev-1){
       cardFx = fx(fxk+':flip','flipcard',900);
@@ -2433,11 +2537,11 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
       </div>${link}</div>`;
     if(idx>0 && idx<rev){
       const ok = playersObj[order[idx-1]].number < p.number;
-      html += `<div class="connector ${ok?'ok':'bad'}" role="img" aria-label="${esc(ok?t('connectorOkText'):t('connectorBadText'))}">${ok?'':icon('x')}</div>`;
+      if(!ok) html += `<span class="sr-only">${esc(t('connectorBadText'))}</span>`;
     }
   }
   html += `</div>`;
-  if(!done) html += `<div class="order-anchor order-anchor-bottom"><span class="anchor-label">${icon('chev-down')}${t('orderLowLabel')}</span><span class="anchor-end">${esc(topic.low)}</span></div>`;
+  if(!done) html += `<div class="order-anchor order-anchor-bottom"><span class="anchor-label"><span class="anc-badge">${icon('arrow-down')}</span>${t('orderLowLabel')}</span></div>`;
   if(!done && over && rev<n){
     if(hostAllowed) html += `<button class="btn btn-primary" onclick="${cb.revealNext}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" style="margin-top:8px;" onclick="${cb.endGame}()">${t('endGameBtn')}</button>`;
     else html += `<div class="helper">${t('waitingRevealText')}</div>`;
@@ -2457,6 +2561,56 @@ document.addEventListener('click',e=>{
   const card=e.target.closest && e.target.closest('.order-card.tap-next'); if(!card || e.target.closest('button')) return;
   const b=card.querySelector('.tok-next'); if(b) b.click();
 });
+/* ---------- event screens: something happens, a screen pops up for a moment, then you are back ---------- */
+const eventQueue=[]; let eventEl=null;
+function queueEvent(key, build, ms, sfx){
+  if(fxSeen.has('ev:'+key)) return;
+  fxSeen.set('ev:'+key, Date.now());
+  eventQueue.push({build, sfx, ms:reduceMotion()?Math.min(ms||0,1200)||ms:ms});
+  if(!eventEl) nextEvent();
+}
+function nextEvent(){
+  const e=eventQueue.shift(); if(!e){ eventEl=null; return; }
+  const d=document.createElement('div'); d.className='event-ov'; d.innerHTML=e.build(); eventEl=d;
+  d.addEventListener('click', ev=>{ if(!ev.target.closest('button')) closeEvent(); });
+  document.body.appendChild(d);
+  SFX.whoosh(); if(e.sfx) e.sfx();
+  if(e.ms) d._t=setTimeout(closeEvent, e.ms);
+}
+function closeEvent(){
+  const d=eventEl; if(!d || d._closing) return; d._closing=true; clearTimeout(d._t);
+  d.classList.add('out');
+  setTimeout(()=>{ d.remove(); if(eventEl===d) eventEl=null; nextEvent(); }, reduceMotion()?0:200);
+}
+function evHeartsSVG(before, after){
+  // three hearts hang from one thread; the thread of the lost heart is cut and it drops and cracks
+  let g='';
+  for(let i=0;i<LIVES;i++){
+    const x=60+i*90;
+    if(i<after) g+=`<g class="ev-swing" style="--d:${i*0.08}s"><line x1="${x}" y1="22" x2="${x}" y2="96"/><g transform="translate(${x} 128)"><path class="ev-hf" d="${HEART_D}"/></g></g>`;
+    else if(i<before) g+=`<line x1="${x}" y1="22" x2="${x}" y2="52"/><g class="ev-fall"><line x1="${x}" y1="58" x2="${x}" y2="96"/><g transform="translate(${x} 128)"><g class="ev-half l"><path class="ev-hf" d="${HEART_D}" clip-path="url(#evL)"/></g><g class="ev-half r"><path class="ev-hf" d="${HEART_D}" clip-path="url(#evR)"/></g></g></g><g class="ev-snip" transform="translate(${x} 55)"><path d="M-9-6 9 6M-9 6 9-6"/></g>`;
+    else g+=`<line class="ev-gone" x1="${x}" y1="22" x2="${x}" y2="40"/>`;
+  }
+  return `<svg class="ev-hearts" viewBox="0 0 300 200" role="img" aria-label="${esc(t('lifeLostAria'))}"><defs><clipPath id="evL"><polygon points="-40,-40 2,-40 -5,-14 5,0 -4,12 0,30 -40,30"/></clipPath><clipPath id="evR"><polygon points="2,-40 40,-40 40,30 0,30 -4,12 5,0 -5,-14"/></clipPath></defs><path class="ev-thread" d="M14 22Q150 30 286 22"/>${g}</svg>`;
+}
+function evRoundStart(round, topic){ return `<div class="ev ev-start"><div class="ev-kicker">${esc(roundLabel(round))}</div><div class="ev-topic">${esc(topic.text)}</div></div>`; }
+function evCleared(players, order, lives){ return `<div class="ev ev-clear"><div class="ev-beads">${order.slice().reverse().map((id,i)=>beadHTML(id,players,'lg ev-jump',`--j:${i*0.08}s`)).join('')}</div><div class="ev-big">${t('roundClearedText')}</div>${livesHTML(lives)}</div>`; }
+function evGameOver(){ return `<div class="ev ev-over"><div class="ev-big ev-over-word">${t('gameOverText')}</div><svg class="ev-cut" viewBox="0 0 300 40" aria-hidden="true"><path class="ev-cut-l" d="M0 20Q75 14 150 20"/><path class="ev-cut-r" d="M150 20Q225 26 300 20"/></svg></div>`; }
+function evOut(host, cb){ return `<div class="ev ev-out" role="dialog" aria-modal="true"><div class="ev-big">${t('outOfLivesText')}</div>${livesHTML(0)}${host?`<button class="btn btn-primary" onclick="closeEvent();${cb.next}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" onclick="closeEvent();${cb.end}()">${t('endGameBtn')}</button>`:`<div class="helper">${t('waitHostText')}</div>`}</div>`; }
+function checkEvents(){
+  let c=null;
+  if(mode==='online' && onlineStep==='room' && room) c={k:'o'+room.code, phase:room.phase, round:room.round, topic:room.topic, players:room.players, order:room.order||[], rev:room.revealed, g:{livesStart:room.livesStart}, lr:room.lastResult, host:isHost(), cb:{next:'hostRevealNext', end:'hostEndGame'}, start:room.phase==='clue'};
+  else if(mode==='local' && localStep==='playing' && local) c={k:'l', phase:local.phase, round:local.round, topic:local.topic, players:local.players, order:local.order||[], rev:local.revealed, g:{livesStart:local.livesStart}, lr:local.lastResult, host:true, cb:{next:'localRevealNext', end:'localEndGame'}, start:local.phase==='pass' && local.passIdx===0};
+  if(!c || !c.topic) return;
+  const key=c.k+':'+c.round;
+  if(c.start) queueEvent(key+':start', ()=>evRoundStart(c.round,c.topic), 1500, ()=>SFX.thud(0.62));
+  if(c.phase!=='reveal') return;
+  const n=c.order.length, rev=revealedCount(c.rev,n), st=(c.g.livesStart!=null?c.g.livesStart:LIVES), lives=livesNow(c.g,c.players,c.order,rev), done=rev>=n && !!c.lr;
+  for(let l=st-1; l>=lives; l--) queueEvent(key+':life:'+l, ()=>`<div class="ev ev-life">${evHeartsSVG(l+1,l)}</div>`, 2100, ()=>{ SFX.snip(0.5); SFX.thud(1.55); SFX.uhoh(1.75); });
+  if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives), 1800, ()=>SFX.jingle(0.2));
+  if(done && lives<=0) queueEvent(key+':over', evGameOver, 2200, ()=>{ SFX.snip(0.55); SFX.falling(0.8); duckMusic(2600); });
+  if(!done && lives<=0) queueEvent(key+':out', ()=>evOut(c.host,c.cb), 0);
+}
 /* ---------- thinking timer: a thread ring that shrinks, with a ticking countdown track ---------- */
 let timerLoop=0, timerLastSec=null, timerLastHalf=null, timerStartedAt=0;
 function timerHTML(endsAt, total){
@@ -2508,7 +2662,7 @@ function timerFrame(){
     return;
   }
   clearInterval(timerLoop); timerLoop=0;
-  if(timerLastSec!==null) timeUpChime();
+  if(timerLastSec!==null){ timeUpChime(); queueEvent('tu:'+end, ()=>`<div class="ev ev-time"><div class="ev-big">${t('timeUpText')}</div></div>`, 1100); }
   el.classList.add('done'); if(num) num.textContent='0';
   if(mode==='local' && local && local.phase==='think') setTimeout(()=>{ if(local && local.phase==='think') localAfterThink(); }, 900);
   else { const tu=document.getElementById('tt-up'); if(tu) tu.textContent=t('timeUpText'); updateMusicMood(); }
@@ -2534,6 +2688,7 @@ function render(){
   app.querySelectorAll('h2').forEach(h=>{ if(fx('h2:'+pageKey()+':'+h.textContent,'x',1000)) h.classList.add('tdraw'); });
   if(mode==='help') revealHelpSteps();
   if(document.getElementById('think-timer')) ensureTimerLoop();
+  checkEvents();
   tiltReset();
   updateMusicMood();
 }
@@ -2820,11 +2975,10 @@ function renderLocalMode(){
     const id=ids[local.passIdx];
     const p=local.players[id], writing=local.phase==='write';
     html += `<div class="round-pill">${roundLabel(local.round)}</div>`;
-    html += `<div class="card" style="text-align:center;padding:34px 18px;">
-      <div class="pass-bead">${beadHTML(id,local.players,'xl bob',bobStyle(id))}</div>
-      <div style="font-size:15px;color:var(--ink-soft);margin-bottom:10px;">${t('nextTurnLabel')}</div>
-      <div style="font-size:23px;font-weight:900;margin-bottom:18px;">${esc(withHonorific(p.name))}</div>
-      <p style="font-size:13px;color:var(--ink-soft);">${writing?t('writePassInstructions'):t('passInstructions')}</p>
+    html += `<div class="pass-stage">
+      <div class="pass-bead">${beadHTML(id,local.players,'xxl bob',bobStyle(id))}</div>
+      <div class="pass-up">${t('nextTurnLabel')}</div>
+      <div class="pass-name">${esc(withHonorific(p.name))}</div>
       <button class="btn btn-primary" style="margin-top:10px;" onclick="${writing?'localStartWrite':'localRevealOwnNumber'}()">${writing?t('writeBtn'):t('revealNumberBtn')}</button>
     </div>`;
     return html;
@@ -2835,8 +2989,8 @@ function renderLocalMode(){
     const id=ids[local.passIdx];
     const p=local.players[id], writing=local.phase==='write-show';
     html += topicBannerHTML(local.topic);
-    html += `<button type="button" id="num-card" class="card number-stage number-btn" aria-pressed="${localNumberShown?'true':'false'}" onclick="toggleLocalNumber()"><div class="lab">${numberOfLabel(esc(p.name))}</div>
-      <div class="num-body">${numberBodyHTML(p.number, localNumberShown)}</div></button>`;
+    html += `<button type="button" id="num-card" class="card number-stage number-btn" aria-pressed="${localNumberShown?'true':'false'}" onclick="toggleLocalNumber()"><div class="lab">${esc(p.name)}</div>
+      <div class="num-body">${numberBodyHTML(p.number, localNumberShown, localHint())}</div></button>`;
     if(writing){
       html += `<div class="field"><label class="label" for="lc-input">${t('clueLabel')}</label>
         <textarea id="lc-input" class="input" placeholder="${t('cluePlaceholder')}"></textarea></div>`;
@@ -2850,7 +3004,7 @@ function renderLocalMode(){
   if(local.phase==='think'){
     html += `<div class="round-pill">${roundLabel(local.round)}</div>`;
     html += topicBannerHTML(local.topic);
-    html += `<h2 class="think-head">${t('thinkHeading')}</h2><p class="subtitle" style="text-align:center;">${local.respond==='say'?t('thinkSubSay'):t('thinkSubType')}</p>`;
+    html += `<h2 class="think-head">${t('thinkHeading')}</h2>`;
     html += timerHTML(local.thinkEnds, local.timer);
     html += `<div class="think-beads">${Object.keys(local.players).map(id=>beadHTML(id,local.players,'lg bob',bobStyle(id))).join('')}</div>`;
     html += `<button class="btn btn-ghost" onclick="localAfterThink()">${t('skipBtn')}</button>`;
@@ -2984,7 +3138,7 @@ function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) histor
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, closeEvent, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
