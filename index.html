@@ -753,6 +753,57 @@
   @keyframes musPulse{0%,100%{box-shadow:inset 0 0 0 1px var(--hair),0 0 0 0 rgba(242,194,83,.55);}60%{box-shadow:inset 0 0 0 1px var(--hair),0 0 0 9px rgba(242,194,83,0);}}
   @keyframes eyeBlink{0%,40%,48%,100%{transform:scaleY(1);}44%{transform:scaleY(.08);}}
   @keyframes eyePeek{0%,60%,100%{transform:translateX(0);}70%{transform:translateX(-2px);}82%{transform:translateX(2px);}}
+
+  /* v31: delayed pop-ups, perfect celebration, game over cut, 罰ゲーム vote */
+  .ev-perfect{position:relative;}
+  .ev-perfect .confetti i{top:10%;}
+  .ev-cut2{width:min(320px,86vw);height:auto;overflow:visible;}
+  .ev-cut2 path{stroke:#EDE6D6;stroke-width:3;fill:none;stroke-linecap:round;}
+  .ev-cut2 .fray{stroke-width:1.6;opacity:0;}
+  .scissors{transform:translate(160px,30px);} .scissors circle,.scissors path{stroke:#F2C253;stroke-width:3;fill:none;stroke-linecap:round;}
+  .bead.cry::before,.bead.cry::after{content:"";position:absolute;top:56%;width:14%;height:20%;background:#8fd0ff;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;opacity:0;}
+  .bead.cry::before{left:26%;} .bead.cry::after{right:26%;}
+  .bead.xxl.batsu-hit{box-shadow:0 0 0 4px #1B1F3B,0 0 0 7px #ff8a80,0 20px 40px -12px rgba(255,120,110,.6);}
+  .bz-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
+  .bz-one{display:flex;flex-direction:column;align-items:center;gap:8px;}
+  .bz-name{font-family:var(--display);font-weight:700;font-size:22px;}
+  .bz-word{color:#ff9d96;font-size:44px;}
+  .bz-head{text-align:center;margin-top:8px;}
+  #app > h2.bz-head::after{margin-left:auto;margin-right:auto;}
+  .bz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:8px 0 22px;}
+  .bz-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border:0;border-radius:22px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--hair);color:var(--white);font:inherit;cursor:pointer;min-height:44px;}
+  .bz-card:disabled{cursor:default;}
+  .bz-card.mine{box-shadow:inset 0 0 0 2px var(--mustard);}
+  .bz-card.win{background:rgba(255,138,128,.16);box-shadow:inset 0 0 0 2px #ff8a80;}
+  .bz-n{font-weight:600;font-size:15px;}
+  .bz-c{font-size:13px;color:var(--mustard);font-weight:700;}
+  .bz-open{margin-top:8px;}
+  @media (prefers-reduced-motion:no-preference){
+    .bead.party{animation:party .7s cubic-bezier(.3,1.6,.5,1) calc(.2s + var(--j,0s)) 3 both;}
+    .ev-perfect .confetti i{animation:confetti 1.8s cubic-bezier(.2,.6,.4,1) calc(var(--d) + .2s) both;}
+    .scissors{animation:scissorsIn .7s cubic-bezier(.3,.8,.3,1) .1s both;}
+    .blade.a{transform-origin:-22px 0;animation:bladeA .3s ease-in .8s both;}
+    .blade.b{transform-origin:-22px 0;animation:bladeB .3s ease-in .8s both;}
+    .cut-l{transform-box:view-box;transform-origin:6px 30px;animation:dropL 1s cubic-bezier(.5,0,.7,1) 1s both;}
+    .cut-r{transform-box:view-box;transform-origin:314px 30px;animation:dropR 1s cubic-bezier(.5,0,.7,1) 1s both;}
+    .ev-cut2 .fray{animation:frayIn .2s ease-out 1s both;}
+    .bead.cry{animation:sadDroop .6s ease-out calc(1.5s + var(--j,0s)) both;}
+    .bead.cry::before,.bead.cry::after{animation:tear 1.1s ease-in calc(1.8s + var(--j,0s)) infinite;}
+    .bead.cry::after{animation-delay:calc(2.15s + var(--j,0s));}
+    .bead.batsu-hit{animation:batsuShake .5s ease-in-out 1.1s 2 both;}
+    .bz-word{animation:landPop .5s cubic-bezier(.3,1.6,.5,1) 1s both;}
+    .bz-row{animation:evPop .6s cubic-bezier(.3,1.4,.5,1) .7s both;}
+  }
+  @keyframes party{0%,100%{transform:translateY(0) rotate(0);}35%{transform:translateY(-22px) rotate(-12deg);}65%{transform:translateY(-6px) rotate(10deg);}}
+  @keyframes scissorsIn{from{transform:translate(-40px,30px) rotate(-20deg);opacity:0;}to{transform:translate(160px,30px);opacity:1;}}
+  @keyframes bladeA{to{transform:rotate(14deg);}}
+  @keyframes bladeB{to{transform:rotate(-14deg);}}
+  @keyframes dropL{to{transform:rotate(38deg);}}
+  @keyframes dropR{to{transform:rotate(-38deg);}}
+  @keyframes frayIn{to{opacity:1;}}
+  @keyframes sadDroop{to{transform:rotate(-8deg) translateY(6px);filter:saturate(.7) brightness(.9);}}
+  @keyframes tear{0%{opacity:0;transform:translateY(0);}20%{opacity:1;}100%{opacity:0;transform:translateY(26px);}}
+  @keyframes batsuShake{0%,100%{transform:rotate(0);}25%{transform:rotate(-9deg) scale(1.05);}75%{transform:rotate(9deg) scale(1.05);}}
 </style>
 </head>
 <body>
@@ -870,7 +921,7 @@ const STRINGS = {
     playerCountLabel:"人数", startLocalBtn:"はじめる",
     nextTurnLabel:"次の番", passInstructions:"画面をこの人に渡してください。準備ができたらタップ。",
     revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次へ",
-    tapToReveal:"タップして表示", lifeLostAria:"ライフを1つ失った", waitHostText:"ホストの選択を待っています", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"次へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
+    tapToReveal:"タップして表示", batsuBtn:"罰ゲームを決める", batsuHeading:"罰ゲームは誰?", batsuSubOnline:"一番ふさわしい人をタップ", batsuSubLocal:"指さして、票の数だけタップ", votedText:"投票しました", batsuShowBtn:"結果を見る", batsuResult:"罰ゲーム!", batsuVotes:"票", batsuBackBtn:"結果にもどる", perfectText:"全員ピッタリ!", lifeLostAria:"ライフを1つ失った", waitHostText:"ホストの選択を待っています", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"次へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
     retopicHeading:"次のお題を決める", thisTopicStartBtn:"このお題で始める",
     bankHeading:"お題バンク",
     bankIntro:"みんなで作るお題集。気に入ったら、ゲーム中の「みんな」からも選べます。",
@@ -947,7 +998,7 @@ const STRINGS = {
     playerCountLabel:"Number of players", startLocalBtn:"Start",
     nextTurnLabel:"Up next", passInstructions:"Hand the device to this person. Tap when ready.",
     revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm and next",
-    tapToReveal:"Tap to reveal", lifeLostAria:"Lost a life", waitHostText:"Waiting for the host", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Next", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
+    tapToReveal:"Tap to reveal", batsuBtn:"Vote for a penalty", batsuHeading:"Who gets the penalty?", batsuSubOnline:"Tap who deserves it most", batsuSubLocal:"Point, then tap once per vote", votedText:"Vote sent", batsuShowBtn:"Show result", batsuResult:"Penalty!", batsuVotes:"votes", batsuBackBtn:"Back to results", perfectText:"Perfect line-up!", lifeLostAria:"Lost a life", waitHostText:"Waiting for the host", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Next", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
     retopicHeading:"Choose the next topic", thisTopicStartBtn:"Start with this topic",
     bankHeading:"Topic bank",
     bankIntro:"A topic collection built together. Pick these in-game under “Community.”",
@@ -2165,8 +2216,45 @@ function hostEndGame(){
   render();
   safeWrite(()=>update(roomRef(room.code), {revealed:n, lastResult:{success}, history:room.history}));
 }
+/* ---------- 罰ゲーム: after game over, everyone votes who gets the penalty ---------- */
+function batsuTally(b, players){ const n={}; Object.values((b&&b.votes)||{}).forEach(v=>{ if(players[v]) n[v]=(n[v]||0)+1; }); Object.entries((b&&b.counts)||{}).forEach(([k,v])=>{ if(players[k]) n[k]=(n[k]||0)+(v||0); }); return n; }
+function batsuWinners(b, players){ const n=batsuTally(b,players), top=Math.max(0,...Object.values(n)); return top>0 ? Object.keys(n).filter(k=>n[k]===top) : []; }
+function evBatsu(players, ids){
+  const beads=ids.map(id=>`<div class="bz-one">${beadHTML(id,players,'xxl batsu-hit')}<div class="bz-name">${esc(players[id].name)}</div></div>`).join('');
+  return `<div class="ev ev-batsu"><div class="ev-kicker">${t('batsuHeading')}</div><div class="bz-row">${beads}</div><div class="ev-big bz-word">${t('batsuResult')}</div></div>`;
+}
+function batsuScreenHTML(players, ids, b, opts){
+  const n=batsuTally(b,players), res=b.phase==='result', win=res?batsuWinners(b,players):[];
+  let h=`<h2 class="bz-head">${t('batsuHeading')}</h2>`;
+  if(!res) h+=`<p class="subtitle" style="text-align:center;">${opts.local?t('batsuSubLocal'):(opts.myVote?t('votedText'):t('batsuSubOnline'))}</p>`;
+  h+=`<div class="bz-grid">`;
+  ids.forEach(id=>{
+    const p=players[id], mine=opts.myVote===id, cnt=n[id]||0, isWin=win.includes(id);
+    const qid=esc(id);
+    const can = !res && (opts.local || (!opts.myVote && opts.canVote && id!==opts.me));
+    h+=`<button type="button" class="bz-card${mine?' mine':''}${isWin?' win':''}" ${can?`onclick="${opts.vote}('${qid}')"`:'disabled'} aria-label="${esc(p.name)}">${beadHTML(id,players,'lg')}<span class="bz-n">${esc(p.name)}</span>${(opts.local||res)&&cnt?`<span class="bz-c">${cnt} ${currentLang()==='en'&&cnt===1?'vote':t('batsuVotes')}</span>`:''}</button>`;
+  });
+  h+=`</div>`;
+  if(!res && opts.host) h+=`<button class="btn btn-primary" onclick="${opts.show}()" ${Object.keys(n).length?'':'disabled'}>${t('batsuShowBtn')}</button>`;
+  if(opts.host) h+=`<button class="btn-textlink" onclick="${opts.back}()">${t('batsuBackBtn')}</button>`;
+  return h;
+}
+function localBatsuStart(){ local.batsu={phase:'vote', counts:{}}; render(); }
+function localBatsuVote(id){ if(!local.batsu||local.batsu.phase!=='vote') return; local.batsu.counts[id]=(local.batsu.counts[id]||0)+1; playTone(880,0,0.05,'sine',0.06); render(); }
+function localBatsuShow(){ if(local.batsu) local.batsu.phase='result'; render(); }
+function localBatsuBack(){ local.batsu=null; render(); }
+function hostBatsuStart(){ if(!isHost()) return; room.batsu={phase:'vote', votes:{}}; render(); safeWrite(()=>update(roomRef(room.code), {batsu:{phase:'vote'}})); }
+function batsuVote(id){
+  if(!room || !room.batsu || room.batsu.phase!=='vote' || id===myId || !room.players[myId]) return;
+  room.batsu.votes=room.batsu.votes||{}; if(room.batsu.votes[myId]) return;
+  room.batsu.votes[myId]=id; playTone(880,0,0.05,'sine',0.06); render();
+  safeWrite(()=>update(roomRef(room.code), {['batsu/votes/'+myId]:id}));
+}
+function hostBatsuShow(){ if(!isHost()||!room.batsu) return; room.batsu.phase='result'; render(); safeWrite(()=>update(roomRef(room.code), {'batsu/phase':'result'})); }
+function hostBatsuBack(){ if(!isHost()) return; room.batsu=null; render(); safeWrite(()=>update(roomRef(room.code), {batsu:null})); }
 function hostNextRound(){
   if(!isHost())return;
+  room.batsu=null;
   const fin = room.phase==='reveal' && room.lastResult && room.order && revealedCount(room.revealed,room.order.length)>=room.order.length;
   const gs=nextGameState({livesStart:room.livesStart, cleared:room.cleared}, room.players, room.order||[], !!fin);
   const newGame = fin && livesNow({livesStart:room.livesStart}, room.players, room.order, room.order.length)<=0;
@@ -2176,7 +2264,7 @@ function hostNextRound(){
   safeWrite(()=>update(roomRef(room.code), gu));
   room.phase='lobby';
   room.lastResult=null; render();
-  safeWrite(()=>update(roomRef(room.code), {phase:'lobby', lastResult:null, revealed:null}));
+  safeWrite(()=>update(roomRef(room.code), {phase:'lobby', lastResult:null, revealed:null, batsu:null}));
 }
 function copyCode(){
   const code=room.code;
@@ -2232,7 +2320,7 @@ function beginLocalRound(){
   const fin = local.phase==='reveal' && local.lastResult && revealedCount(local.revealed,(local.order||[]).length)>=(local.order||[]).length;
   const gs=nextGameState({livesStart:local.livesStart, cleared:local.cleared}, local.players, local.order||[], !!fin);
   if(fin && livesNow({livesStart:local.livesStart}, local.players, local.order, local.order.length)<=0){ local.round=0; local.history=[]; }   // new game: back to round 1
-  local.livesStart=gs.livesStart; local.cleared=gs.cleared;
+  local.livesStart=gs.livesStart; local.cleared=gs.cleared; local.batsu=null;
   let topic=local.pendingTopic;
   if(local.topicMode==='presetRandom' || !topic){
     topic=pickRandomTopic(local.usedTopics, l);
@@ -2580,6 +2668,7 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     if(hostAllowed) html += `<button class="btn btn-primary" onclick="${cb.revealNext}()">${t('revealNextBtn')}</button>`;
     else html += `<div class="helper">${rev===0?t('waitingHostJudgeText'):t('waitingRevealText')}</div>`;
   } else if(hostAllowed){
+    if(over && cb.batsu) html += `<button class="btn btn-secondary bz-open" onclick="${cb.batsu}()">${t('batsuBtn')}</button>`;
     html += `<button class="btn btn-primary" onclick="${cb.next}()">${over?t('newGameBtn'):t('playAgainBtn')}</button>`;
     if(cb.changeTopic && !over) html += `<button class="btn-textlink" onclick="${cb.changeTopic}()">${t('changeTopicBtn')}</button>`;
   } else {
@@ -2594,9 +2683,10 @@ document.addEventListener('click',e=>{
 });
 /* ---------- event screens: something happens, a screen pops up for a moment, then you are back ---------- */
 const eventQueue=[]; let eventEl=null;
-function queueEvent(key, build, ms, sfx){
+function queueEvent(key, build, ms, sfx, delay){
   if(fxSeen.has('ev:'+key)) return;
   fxSeen.set('ev:'+key, Date.now());
+  if(delay){ setTimeout(()=>queueEvent(key+':go', build, ms, sfx), delay); return; }   // let people see the flipped card first
   eventQueue.push({build, sfx, ms:reduceMotion()?Math.min(ms||0,1200)||ms:ms});
   if(!eventEl) nextEvent();
 }
@@ -2626,21 +2716,36 @@ function evHeartsSVG(before, after){
 }
 function evRoundStart(round, topic){ return `<div class="ev ev-start"><div class="ev-kicker">${esc(roundLabel(round))}</div><div class="ev-topic">${esc(topic.text)}</div></div>`; }
 function evCleared(players, order, lives, line){ return `<div class="ev ev-clear"><div class="ev-beads">${order.slice().reverse().map((id,i)=>beadHTML(id,players,'xl ev-jump',`--j:${i*0.08}s`)).join('')}</div>${line?`<div class="ev-big">${esc(line)}</div>`:''}${livesHTML(lives)}</div>`; }
-function evGameOver(){ return `<div class="ev ev-over"><div class="ev-big ev-over-word">${t('gameOverText')}</div><svg class="ev-cut" viewBox="0 0 300 40" aria-hidden="true"><path class="ev-cut-l" d="M0 20Q75 14 150 20"/><path class="ev-cut-r" d="M150 20Q225 26 300 20"/></svg></div>`; }
+function evGameOver(players, order){
+  const beads=(order||[]).slice().reverse().map((id,i)=>beadHTML(id,players,'xl cry',`--j:${i*0.1}s`)).join('');
+  return `<div class="ev ev-over"><div class="ev-big ev-over-word">${t('gameOverText')}</div>
+    <svg class="ev-cut2" viewBox="0 0 320 90" aria-hidden="true">
+      <g class="cut-l"><path d="M6 30Q90 24 157 30"/><path class="fray" d="M157 30l5-4M157 30l6 1M157 30l4 5"/></g>
+      <g class="cut-r"><path d="M163 30Q230 36 314 30"/><path class="fray" d="M163 30l-5-4M163 30l-6 1M163 30l-4 5"/></g>
+      <g class="scissors"><g class="blade a"><circle cx="-22" cy="-9" r="7"/><path d="M-16-6L14 4"/></g><g class="blade b"><circle cx="-22" cy="9" r="7"/><path d="M-16 6L14-4"/></g></g>
+    </svg><div class="ev-beads">${beads}</div></div>`;
+}
+function evPerfect(players, order, line){
+  const beads=order.slice().reverse().map((id,i)=>beadHTML(id,players,'xl party',`--j:${i*0.09}s`)).join('');
+  return `<div class="ev ev-perfect"><div class="ev-beads">${beads}</div><div class="ev-big">${esc(line)}</div><div class="ev-kicker">${t('perfectText')}</div>${confettiHTML()}</div>`;
+}
+function evGameOverOld(){ return `<div class="ev ev-over"><div class="ev-big ev-over-word">${t('gameOverText')}</div><svg class="ev-cut" viewBox="0 0 300 40" aria-hidden="true"><path class="ev-cut-l" d="M0 20Q75 14 150 20"/><path class="ev-cut-r" d="M150 20Q225 26 300 20"/></svg></div>`; }
 function evOut(host, cb){ return `<div class="ev ev-out" role="dialog" aria-modal="true"><div class="ev-big">${t('outOfLivesText')}</div>${livesHTML(0)}${host?`<button class="btn btn-primary" onclick="closeEvent();${cb.next}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" onclick="closeEvent();${cb.end}()">${t('endGameBtn')}</button>`:`<div class="helper">${t('waitHostText')}</div>`}</div>`; }
 function checkEvents(){
   let c=null;
-  if(mode==='online' && onlineStep==='room' && room) c={k:'o'+room.code, phase:room.phase, round:room.round, topic:room.topic, players:room.players, order:room.order||[], rev:room.revealed, g:{livesStart:room.livesStart}, lr:room.lastResult, host:isHost(), cb:{next:'hostRevealNext', end:'hostEndGame'}, start:room.phase==='clue'};
-  else if(mode==='local' && localStep==='playing' && local) c={k:'l', phase:local.phase, round:local.round, topic:local.topic, players:local.players, order:local.order||[], rev:local.revealed, g:{livesStart:local.livesStart}, lr:local.lastResult, host:true, cb:{next:'localRevealNext', end:'localEndGame'}, start:local.phase==='pass' && local.passIdx===0};
+  if(mode==='online' && onlineStep==='room' && room) c={k:'o'+room.code, phase:room.phase, round:room.round, topic:room.topic, players:room.players, order:room.order||[], rev:room.revealed, g:{livesStart:room.livesStart}, lr:room.lastResult, host:isHost(), cb:{next:'hostRevealNext', end:'hostEndGame'}, start:room.phase==='clue', batsu:room.batsu};
+  else if(mode==='local' && localStep==='playing' && local) c={k:'l', phase:local.phase, round:local.round, topic:local.topic, players:local.players, order:local.order||[], rev:local.revealed, g:{livesStart:local.livesStart}, lr:local.lastResult, host:true, cb:{next:'localRevealNext', end:'localEndGame'}, start:local.phase==='pass' && local.passIdx===0, batsu:local.batsu};
   if(!c || !c.topic) return;
   const key=c.k+':'+c.round;
   if(c.start) queueEvent(key+':start', ()=>evRoundStart(c.round,c.topic), 1500, ()=>SFX.thud(0.62));
   if(c.phase!=='reveal') return;
+  if(c.batsu && c.batsu.phase==='result') queueEvent(key+':batsu', ()=>evBatsu(c.players, batsuWinners(c.batsu, c.players)), 2600, ()=>{ for(let i=0;i<10;i++) noiseBurst(0.05,300,500,0.06,i*0.07); SFX.jingle(0.8); });
   const n=c.order.length, rev=revealedCount(c.rev,n), st=(c.g.livesStart!=null?c.g.livesStart:LIVES), lives=livesNow(c.g,c.players,c.order,rev), done=rev>=n && !!c.lr;
-  for(let l=st-1; l>=lives; l--) queueEvent(key+':life:'+l, ()=>`<div class="ev ev-life">${evHeartsSVG(l+1,l)}</div>`, 2100, ()=>{ SFX.snip(0.5); SFX.thud(1.55); SFX.uhoh(1.75); });
-  if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives, orderIsCorrect(c.players,c.order)?pickLine(WIN_LINES,c.round+':'+c.topic.text):''), 1800, ()=>SFX.jingle(0.2));
-  if(done && lives<=0) queueEvent(key+':over', evGameOver, 2200, ()=>{ SFX.snip(0.55); SFX.falling(0.8); duckMusic(2600); });
-  if(!done && lives<=0) queueEvent(key+':out', ()=>evOut(c.host,c.cb), 0);
+  for(let l=st-1; l>=lives; l--) queueEvent(key+':life:'+l, ()=>`<div class="ev ev-life">${evHeartsSVG(l+1,l)}</div>`, 2100, ()=>{ SFX.snip(0.5); SFX.thud(1.55); SFX.uhoh(1.75); }, 1100);
+  if(done && lives>0 && orderIsCorrect(c.players,c.order)) queueEvent(key+':perfect', ()=>evPerfect(c.players,c.order,pickLine(WIN_LINES,c.round+':'+c.topic.text)), 2300, ()=>{ SFX.jingle(0.15); SFX.jingle(0.75); }, 1500);
+  else if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives,''), 1800, ()=>SFX.jingle(0.2), 1500);
+  if(done && lives<=0) queueEvent(key+':over', ()=>evGameOver(c.players,c.order), 3200, ()=>{ SFX.snip(0.95); SFX.falling(1.3); duckMusic(3600); }, 1500);
+  if(!done && lives<=0) queueEvent(key+':out', ()=>evOut(c.host,c.cb), 0, null, 1100);
 }
 /* ---------- thinking timer: a thread ring that shrinks, with a ticking countdown track ---------- */
 let timerLoop=0, timerLastSec=null, timerLastHalf=null, timerStartedAt=0;
@@ -2950,12 +3055,15 @@ function renderOnlineMode(){
     return html;
   }
 
+  if(room.phase==='reveal' && room.batsu){
+    return html + batsuScreenHTML(room.players, orderedIds(room.players), room.batsu, {local:false, host:isHost(), me:myId, canVote:!!room.players[myId], myVote:(room.batsu.votes||{})[myId], vote:'batsuVote', show:'hostBatsuShow', back:'hostBatsuBack'});
+  }
   if(room.phase==='order' || room.phase==='reveal'){
     const activeIds = room.order || [];
     if(!activeIds.includes(myId)){
       html += `<div class="helper spectator-note">${icon('eye')}<span>${t('spectatorWatchingText')}</span></div>`;
     }
-    html += renderOrderAndReveal(room.players, room.order, room.topic, room.phase, room.round, room.history, isHost(), {move:'moveOrder', reveal:'hostReveal', revealNext:'hostRevealNext', next:'hostNextRound', endGame:'hostEndGame'}, room.revealed, {livesStart:room.livesStart, cleared:room.cleared});
+    html += renderOrderAndReveal(room.players, room.order, room.topic, room.phase, room.round, room.history, isHost(), {move:'moveOrder', reveal:'hostReveal', revealNext:'hostRevealNext', next:'hostNextRound', endGame:'hostEndGame', batsu:'hostBatsuStart'}, room.revealed, {livesStart:room.livesStart, cleared:room.cleared});
     return html;
   }
 
@@ -3055,8 +3163,11 @@ function renderLocalMode(){
     return html;
   }
 
+  if(local.phase==='reveal' && local.batsu){
+    return html + batsuScreenHTML(local.players, Object.keys(local.players), local.batsu, {local:true, host:true, vote:'localBatsuVote', show:'localBatsuShow', back:'localBatsuBack'});
+  }
   if(local.phase==='order' || local.phase==='reveal'){
-    html += renderOrderAndReveal(local.players, local.order, local.topic, local.phase, local.round, local.history, true, {move:'localMoveOrder', reveal:'localReveal', revealNext:'localRevealNext', next:'localStartNextRound', changeTopic:'localGoTopicPick', endGame:'localEndGame'}, local.revealed, {livesStart:local.livesStart, cleared:local.cleared});
+    html += renderOrderAndReveal(local.players, local.order, local.topic, local.phase, local.round, local.history, true, {move:'localMoveOrder', reveal:'localReveal', revealNext:'localRevealNext', next:'localStartNextRound', changeTopic:'localGoTopicPick', endGame:'localEndGame', batsu:'localBatsuStart'}, local.revealed, {livesStart:local.livesStart, cleared:local.cleared});
     return html;
   }
 
@@ -3169,7 +3280,7 @@ function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) histor
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, closeEvent, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, closeEvent, localBatsuStart, localBatsuVote, localBatsuShow, localBatsuBack, hostBatsuStart, batsuVote, hostBatsuShow, hostBatsuBack, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
