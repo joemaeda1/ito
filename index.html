@@ -804,6 +804,31 @@
   @keyframes sadDroop{to{transform:rotate(-8deg) translateY(6px);filter:saturate(.7) brightness(.9);}}
   @keyframes tear{0%{opacity:0;transform:translateY(0);}20%{opacity:1;}100%{opacity:0;transform:translateY(26px);}}
   @keyframes batsuShake{0%,100%{transform:rotate(0);}25%{transform:rotate(-9deg) scale(1.05);}75%{transform:rotate(9deg) scale(1.05);}}
+
+  /* v32: topic roulette, dealt number card, score */
+  .topic-banner{position:relative;}
+  .tb-shuffle{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(43,36,64,.12);color:#2B2440;display:grid;place-items:center;cursor:pointer;}
+  .tb-shuffle .ic{width:22px;height:22px;stroke-width:2;}
+  .topic-banner.spinning .ttext{filter:blur(.4px);}
+  .number-btn .num-body{perspective:900px;}
+  .dcard{position:relative;width:150px;height:210px;margin:10px auto 12px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1);}
+  .dcard.up{transform:rotateY(180deg);}
+  .dc-face{position:absolute;inset:0;border-radius:18px;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 22px 34px -18px rgba(0,0,0,.7);}
+  .dc-back{background:linear-gradient(160deg,#36407a,#232a55);box-shadow:inset 0 0 0 2px rgba(255,250,242,.14),inset 0 0 0 8px #2b336a,inset 0 0 0 9px rgba(232,113,74,.55),0 22px 34px -18px rgba(0,0,0,.7);}
+  .dc-mark{font-family:var(--display);font-weight:700;font-size:40px;color:#FFF8EC;letter-spacing:.02em;}
+  .dc-front{background:#FFF8EC;transform:rotateY(180deg);box-shadow:inset 0 0 0 2px rgba(0,0,0,.05),0 22px 34px -18px rgba(0,0,0,.7);}
+  .number-btn .dcard .number-display{width:auto;height:auto;margin:0;background:none;box-shadow:none;color:#2B2440;font-size:76px;}
+  .score{padding:6px 0 4px;}
+  .sc-label{flex-basis:100%;text-align:center;font-family:var(--display);font-weight:700;font-size:16px;color:var(--mustard);letter-spacing:.06em;}
+  .sc-num{flex-basis:100%;text-align:center;font-family:var(--display);font-weight:700;font-size:64px;line-height:1.05;color:var(--white);font-variant-numeric:tabular-nums;}
+  .sc-sub{flex-basis:100%;text-align:center;font-size:14px;color:rgba(255,250,242,.7);}
+  @media (prefers-reduced-motion:reduce){ .dcard{transition:none;} }
+  @media (prefers-reduced-motion:no-preference){
+    .number-btn.dealt-in .num-body{animation:dealCard .55s cubic-bezier(.2,.9,.3,1.1) both;}
+    .topic-banner.spinning{animation:spinShake .12s linear infinite;}
+  }
+  @keyframes dealCard{0%{transform:translateY(120px) rotate(-10deg) scale(.9);opacity:0;}100%{transform:none;opacity:1;}}
+  @keyframes spinShake{0%,100%{translate:0 0;}50%{translate:0 1.5px;}}
 </style>
 </head>
 <body>
@@ -921,7 +946,7 @@ const STRINGS = {
     playerCountLabel:"人数", startLocalBtn:"はじめる",
     nextTurnLabel:"次の番", passInstructions:"画面をこの人に渡してください。準備ができたらタップ。",
     revealNumberBtn:"準備OK", decideAndPassBtn:"決定して次へ",
-    tapToReveal:"タップして表示", batsuBtn:"罰ゲームを決める", batsuHeading:"罰ゲームは誰?", batsuSubOnline:"一番ふさわしい人をタップ", batsuSubLocal:"指さして、票の数だけタップ", votedText:"投票しました", batsuShowBtn:"結果を見る", batsuResult:"罰ゲーム!", batsuVotes:"票", batsuBackBtn:"結果にもどる", perfectText:"全員ピッタリ!", lifeLostAria:"ライフを1つ失った", waitHostText:"ホストの選択を待っています", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"次へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
+    tapToReveal:"タップして表示", finalScoreText:"スコア", shuffleAria:"お題を変える", batsuBtn:"罰ゲームを決める", batsuHeading:"罰ゲームは誰?", batsuSubOnline:"一番ふさわしい人をタップ", batsuSubLocal:"指さして、票の数だけタップ", votedText:"投票しました", batsuShowBtn:"結果を見る", batsuResult:"罰ゲーム!", batsuVotes:"票", batsuBackBtn:"結果にもどる", perfectText:"全員ピッタリ!", lifeLostAria:"ライフを1つ失った", waitHostText:"ホストの選択を待っています", roundClearedText:"ラウンドクリア", gameOverText:"ゲームオーバー", outOfLivesText:"ライフがなくなった", endGameBtn:"ここで終わる", finishFlipBtn:"最後までめくる", newGameBtn:"新しいゲーム", respondLabel:"回答の出し方", respondType:"入力する", respondSay:"声に出す", timerLabel:"考える時間", timerOff:"なし", secUnit:"秒", peekDoneBtn:"次へ", writePassInstructions:"画面をこの人に渡して、回答を書いてもらおう。", writeBtn:"回答を書く", thinkHeading:"考える時間", thinkSubType:"回答を考えよう。このあと1人ずつ入力します。", thinkSubSay:"なんて言うか考えよう。", skipBtn:"スキップ", timeUpText:"時間です!", startTimerBtn:"タイマーをスタート", peekLabel:"数字を見る", pickCharLabel:"キャラクターをえらぶ", takenLabel:"使用中", tapToHide:"タップして隠す",
     retopicHeading:"次のお題を決める", thisTopicStartBtn:"このお題で始める",
     bankHeading:"お題バンク",
     bankIntro:"みんなで作るお題集。気に入ったら、ゲーム中の「みんな」からも選べます。",
@@ -998,7 +1023,7 @@ const STRINGS = {
     playerCountLabel:"Number of players", startLocalBtn:"Start",
     nextTurnLabel:"Up next", passInstructions:"Hand the device to this person. Tap when ready.",
     revealNumberBtn:"I'm ready", decideAndPassBtn:"Confirm and next",
-    tapToReveal:"Tap to reveal", batsuBtn:"Vote for a penalty", batsuHeading:"Who gets the penalty?", batsuSubOnline:"Tap who deserves it most", batsuSubLocal:"Point, then tap once per vote", votedText:"Vote sent", batsuShowBtn:"Show result", batsuResult:"Penalty!", batsuVotes:"votes", batsuBackBtn:"Back to results", perfectText:"Perfect line-up!", lifeLostAria:"Lost a life", waitHostText:"Waiting for the host", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Next", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
+    tapToReveal:"Tap to reveal", finalScoreText:"Final score", shuffleAria:"Change topic", batsuBtn:"Vote for a penalty", batsuHeading:"Who gets the penalty?", batsuSubOnline:"Tap who deserves it most", batsuSubLocal:"Point, then tap once per vote", votedText:"Vote sent", batsuShowBtn:"Show result", batsuResult:"Penalty!", batsuVotes:"votes", batsuBackBtn:"Back to results", perfectText:"Perfect line-up!", lifeLostAria:"Lost a life", waitHostText:"Waiting for the host", roundClearedText:"Round cleared", gameOverText:"Game over", outOfLivesText:"Out of lives", endGameBtn:"End game", finishFlipBtn:"Finish flipping", newGameBtn:"New game", respondLabel:"Responses", respondType:"Type them", respondSay:"Say out loud", timerLabel:"Thinking timer", timerOff:"Off", secUnit:"s", peekDoneBtn:"Next", writePassInstructions:"Hand the device to this person to write their response.", writeBtn:"Write my response", thinkHeading:"Thinking time", thinkSubType:"Think of your response. You will type it next, one by one.", thinkSubSay:"Think of what you will say.", skipBtn:"Skip", timeUpText:"Time's up!", startTimerBtn:"Start timer", peekLabel:"See your number", pickCharLabel:"Pick your character", takenLabel:"taken", tapToHide:"Tap to hide",
     retopicHeading:"Choose the next topic", thisTopicStartBtn:"Start with this topic",
     bankHeading:"Topic bank",
     bankIntro:"A topic collection built together. Pick these in-game under “Community.”",
@@ -1267,6 +1292,7 @@ const ICONS = {
   'book':'<path d="M3.8 5.6c2.8-1.1 5.5-.8 8.2 1.1 2.7-1.9 5.4-2.2 8.2-1.1v12.2c-2.8-1.1-5.5-.8-8.2 1.1-2.7-1.9-5.4-2.2-8.2-1.1z"/><path d="M12 6.7v12.2"/>',
   'chev-right':'<path d="M9.5 5.5L16 12l-6.5 6.5"/>', 'chev-left':'<path d="M14.5 5.5L8 12l6.5 6.5"/>',
   'arrow-up':'<path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/>', 'arrow-down':'<path d="M12 5v14M5.5 12.5 12 19l6.5-6.5"/>',
+  'shuffle':'<path d="M3 7h3.5c2.2 0 3.6 1.1 4.8 3l1.4 2.2c1.2 1.9 2.6 3 4.8 3H21M3 17h3.5c1.6 0 2.8-.6 3.8-1.7M14.7 8.7c1-1.1 2.2-1.7 3.8-1.7H21M18 4l3 3-3 3M18 14l3 3-3 3"/>',
   'flip':'<rect x="8" y="3.5" width="9" height="13" rx="2"/><path d="M4.5 12.5a7.5 7.5 0 0 0 8.5 7.6"/><path d="M10.6 18.4l2.6 1.8-2 2.3"/>',
   'heart':'<path d="M12 20s-7.5-4.6-7.5-10.1A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
   'clock':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 3h5"/>',
@@ -2341,11 +2367,20 @@ let localNumberShown=false;   // the number is hidden by default on each player'
 function localRevealOwnNumber(){ local.phase='pass-show'; localNumberShown=false; render(); }
 // The hint words show only when they help (first player of the first round in Local, always Online); otherwise just an eye icon.
 function localHint(){ return !!(local && local.round===1 && local.passIdx===0); }
+function numHintHTML(shown, hint){ return shown ? (hint?t('tapToHide'):'') : `${icon('eye')}${hint?`<span>${t('tapToReveal')}</span>`:''}`; }
 function numberBodyHTML(num, shown, hint){
   if(hint===undefined) hint=true;
-  return shown
-    ? `<div class="number-display">${num}</div><div class="num-hint">${hint?t('tapToHide'):''}</div>`
-    : `<div class="number-display number-hidden">•••</div><div class="num-hint">${icon('eye')}${hint?`<span>${t('tapToReveal')}</span>`:''}</div>`;
+  return `<div class="dcard${shown?' up':''}"><div class="dc-face dc-back"><span class="dc-mark">ito</span></div><div class="dc-face dc-front"><span class="number-display">${shown?num:''}</span></div></div><div class="num-hint">${numHintHTML(shown,hint)}</div>`;
+}
+// Flip the card in place (no redraw, so typed text stays). The number is put on the face only while it is showing.
+function flipNumberCard(btn, num, shown, hint){
+  const c=btn.querySelector('.dcard'), d=btn.querySelector('.number-display'), h=btn.querySelector('.num-hint');
+  btn.setAttribute('aria-pressed', shown?'true':'false');
+  if(h) h.innerHTML=numHintHTML(shown,hint);
+  if(!c||!d) return;
+  clearTimeout(btn._clr);
+  if(shown){ d.textContent=num; c.classList.add('up'); setTimeout(()=>countUp(d,num),150); playTone(520,0,0.06,'triangle',0.05); }
+  else { c.classList.remove('up'); btn._clr=setTimeout(()=>{ if(!c.classList.contains('up')) d.textContent=''; }, 450); playTone(440,0,0.06,'triangle',0.04); }
 }
 // Toggles in place (no re-render) so whatever the player has typed in the hint box is kept.
 // Your number rolls up quickly and lands on the real one (a little slot-machine moment).
@@ -2366,20 +2401,37 @@ function toggleLocalNumber(){
   const ids=Object.keys(local.players);
   const p=local.players[ids[local.passIdx]]; if(!p) return;
   localNumberShown=!localNumberShown;
-  el.setAttribute('aria-pressed', localNumberShown?'true':'false');
-  el.querySelector('.num-body').innerHTML=numberBodyHTML(p.number, localNumberShown, localHint());
-  if(localNumberShown) countUp(el.querySelector('.number-display'), p.number);
+  flipNumberCard(el, p.number, localNumberShown, localHint());
 }
 // Online answer screen: tap the card to hide or show your number, in place so typed text stays.
 let onlineNumberShown=true, onlineNumberKey='';
 function toggleOnlineNumber(){
   const el=document.getElementById('on-num-card'); if(!el||!room||!room.players[myId]) return;
   onlineNumberShown=!onlineNumberShown;
-  el.setAttribute('aria-pressed', onlineNumberShown?'true':'false');   // same as Local: pressed = shown
-  el.querySelector('.num-body').innerHTML=numberBodyHTML(room.players[myId].number, onlineNumberShown);
-  if(onlineNumberShown) countUp(el.querySelector('.number-display'), room.players[myId].number);
+  flipNumberCard(el, room.players[myId].number, onlineNumberShown, true);
 }
 // Pass 1: everyone peeks at their number. Then the thinking timer. Then pass 2 to type (or straight to arranging when said out loud).
+// Roulette: the topic text spins through other topics, slows down, and lands on a new one.
+let rouletteBusy=false;
+function spinTopic(apply, l, used){
+  if(rouletteBusy) return; const next=pickRandomTopic(used, l);
+  const el=document.querySelector('.topic-banner .ttext');
+  if(!el || reduceMotion()){ apply(next); return; }
+  rouletteBusy=true; const banner=el.closest('.topic-banner'); banner.classList.add('spinning');
+  const pool=topicsFor(l); let i=0; const steps=[50,50,55,60,70,80,95,115,140,170];
+  const tick=()=>{ if(i>=steps.length){ rouletteBusy=false; banner.classList.remove('spinning'); apply(next); return; }
+    el.textContent=pool[Math.floor(Math.random()*pool.length)].text; playTone(1200-i*40,0,0.03,'sine',0.05); setTimeout(tick, steps[i++]); };
+  tick();
+}
+function localShuffleTopic(){
+  if(!local || local.phase!=='pass' || local.passIdx!==0 || local.topicMode!=='presetRandom') return;
+  spinTopic(tp=>{ local.topic=tp; local.usedTopics=(local.usedTopics||[]).concat([tp.text]); SFX.thud(0); render(); }, currentLang(), local.usedTopics);
+}
+function hostShuffleTopic(){
+  if(!isHost() || room.phase!=='clue' || room.topicMode!=='presetRandom') return;
+  if(Object.values(room.players).some(p=>p.submitted)) return;
+  spinTopic(tp=>{ room.topic=tp; room.usedTopics=(room.usedTopics||[]).concat([tp.text]); SFX.thud(0); render(); safeWrite(()=>update(roomRef(room.code), {topic:tp, usedTopics:room.usedTopics})); }, currentLang(), room.usedTopics);
+}
 function localPeekDone(){
   const ids=Object.keys(local.players);
   local.passIdx++; localNumberShown=false;
@@ -2565,8 +2617,8 @@ function renderErrorBanner(){
   return `<div class="error">${esc(errorMsg)}</div>`;
 }
 
-function topicBannerHTML(topic){
-  return `<div class="topic-banner${fx('tb:'+topic.text,' dealt',900)}"><div class="ttext">${esc(topic.text)}</div>
+function topicBannerHTML(topic, shuffleFn){
+  return `<div class="topic-banner${fx('tb:'+topic.text,' dealt',900)}">${shuffleFn?`<button type="button" class="tb-shuffle" onclick="${shuffleFn}()" aria-label="${esc(t('shuffleAria'))}">${icon('shuffle')}</button>`:''}<div class="ttext">${esc(topic.text)}</div>
     <div class="scale-rows">
       <div class="scale-row"><span class="scale-num">1 →</span><span class="scale-txt">${esc(topic.low)}</span></div>
       <div class="scale-row"><span class="scale-num">100 →</span><span class="scale-txt">${esc(topic.high)}</span></div>
@@ -2616,7 +2668,10 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
   if(done){
     const once=fx(cb.revealNext+':result:'+round,'fresh',1800), lineKey=round+':'+topic.text;
     if(over){
-      html += `<div class="result-banner fail over${once}"><div class="res-line"><div class="big">${t('gameOverText')}</div></div></div>`;
+      // Score: each cleared round is worth (players - 1), the number of neighbor pairs the group had to get right.
+      const nP=order.length, score=(g.cleared||0)*Math.max(1,nP-1), sk=fx(lkey+':score','fresh',1500);
+      html += `<div class="result-banner over score${once}"><div class="sc-label">${t('finalScoreText')}</div><div class="sc-num" data-score="${score}">${sk?0:score}</div><div class="sc-sub">${esc(roundsClearedText(g.cleared||0))} · ${nP} ${currentLang()==='en'?'players':'人'}</div></div>`;
+      if(sk) setTimeout(()=>{ const el=document.querySelector('.sc-num'); if(el){ if(score>0) countUp(el, score); else el.textContent='0'; } }, 600);
     } else if(success){
       html += `<div class="result-banner success${once}"><div class="res-line">${icon('check')}<div class="big">${esc(pickLine(WIN_LINES,lineKey))}</div></div>${once?confettiHTML():''}</div>`;
     } else {
@@ -2691,7 +2746,8 @@ function queueEvent(key, build, ms, sfx, delay){
   if(!eventEl) nextEvent();
 }
 function nextEvent(){
-  const e=eventQueue.shift(); if(!e){ eventEl=null; return; }
+  let e=eventQueue.shift(); while(e && !e.ms && !e.build()){ e=eventQueue.shift(); }   // skip empty markers
+  if(!e){ eventEl=null; return; }
   const d=document.createElement('div'); d.className='event-ov'; d.innerHTML=e.build(); eventEl=d;
   d.addEventListener('click', ev=>{ if(!ev.target.closest('button')) closeEvent(); });
   document.body.appendChild(d);
@@ -2744,7 +2800,7 @@ function checkEvents(){
   for(let l=st-1; l>=lives; l--) queueEvent(key+':life:'+l, ()=>`<div class="ev ev-life">${evHeartsSVG(l+1,l)}</div>`, 2100, ()=>{ SFX.snip(0.5); SFX.thud(1.55); SFX.uhoh(1.75); }, 1100);
   if(done && lives>0 && orderIsCorrect(c.players,c.order)) queueEvent(key+':perfect', ()=>evPerfect(c.players,c.order,pickLine(WIN_LINES,c.round+':'+c.topic.text)), 2300, ()=>{ SFX.jingle(0.15); SFX.jingle(0.75); }, 1500);
   else if(done && lives>0) queueEvent(key+':cleared', ()=>evCleared(c.players,c.order,lives,''), 1800, ()=>SFX.jingle(0.2), 1500);
-  if(done && lives<=0) queueEvent(key+':over', ()=>evGameOver(c.players,c.order), 3200, ()=>{ SFX.snip(0.95); SFX.falling(1.3); duckMusic(3600); }, 1500);
+  if(done && lives<=0) queueEvent(key+':score', ()=>'', 0, null, 900);   // no pop-up at game over; the score sits on the page
   if(!done && lives<=0) queueEvent(key+':out', ()=>evOut(c.host,c.cb), 0, null, 1100);
 }
 /* ---------- thinking timer: a thread ring that shrinks, with a ticking countdown track ---------- */
@@ -3028,7 +3084,7 @@ function renderOnlineMode(){
     const activeIds = room.order || [];
     const amActive = activeIds.includes(myId);
     html += `<div class="round-row"><div class="round-pill">${roundLabel(room.round)}</div>${renderHistoryDots(room.history)}</div>`;
-    html += topicBannerHTML(room.topic);
+    html += topicBannerHTML(room.topic, (isHost() && room.topicMode==='presetRandom' && !Object.values(room.players).some(p=>p.submitted)) ? 'hostShuffleTopic' : null);
     if(!amActive){
       html += `<div class="card" style="text-align:center;padding:24px 18px;">
         <div class="spectator-ico">${icon('eye')}</div>
@@ -3037,7 +3093,7 @@ function renderOnlineMode(){
       return html;
     }
     const nk=room.code+':'+room.round; if(onlineNumberKey!==nk){ onlineNumberKey=nk; onlineNumberShown=true; setTimeout(()=>{ const c=document.getElementById('on-num-card'); if(c && room && room.players[myId]) countUp(c.querySelector('.number-display'), room.players[myId].number); },0); }
-    html += `<button type="button" id="on-num-card" class="card number-stage number-btn" aria-pressed="${onlineNumberShown?'true':'false'}" onclick="toggleOnlineNumber()"><div class="lab">${t('yourNumberLabel')}</div>
+    html += `<button type="button" id="on-num-card" class="card number-stage number-btn${fx('deal:'+room.code+':'+room.round,' dealt-in',900)}" aria-pressed="${onlineNumberShown?'true':'false'}" onclick="toggleOnlineNumber()"><div class="lab">${t('yourNumberLabel')}</div>
       <div class="num-body">${numberBodyHTML(me.number, onlineNumberShown)}</div></button>`;
     html += renderErrorBanner();
     if(!me.submitted){
@@ -3114,6 +3170,7 @@ function renderLocalMode(){
     const id=ids[local.passIdx];
     const p=local.players[id], writing=local.phase==='write';
     html += `<div class="round-pill">${roundLabel(local.round)}</div>`;
+    if(!writing && local.passIdx===0) html += topicBannerHTML(local.topic, local.topicMode==='presetRandom'?'localShuffleTopic':null);
     html += `<div class="pass-stage">
       <div class="pass-bead">${beadHTML(id,local.players,'xxl bob',bobStyle(id))}</div>
       <div class="pass-up">${t('nextTurnLabel')}</div>
@@ -3128,7 +3185,7 @@ function renderLocalMode(){
     const id=ids[local.passIdx];
     const p=local.players[id], writing=local.phase==='write-show';
     html += topicBannerHTML(local.topic);
-    html += `<button type="button" id="num-card" class="card number-stage number-btn" aria-pressed="${localNumberShown?'true':'false'}" onclick="toggleLocalNumber()"><div class="lab">${esc(p.name)}</div>
+    html += `<button type="button" id="num-card" class="card number-stage number-btn${fx('deal:l:'+local.round+':'+local.phase+':'+local.passIdx,' dealt-in',900)}" aria-pressed="${localNumberShown?'true':'false'}" onclick="toggleLocalNumber()"><div class="lab">${esc(p.name)}</div>
       <div class="num-body">${numberBodyHTML(p.number, localNumberShown, localHint())}</div></button>`;
     if(writing){
       html += `<div class="field"><label class="label" for="lc-input">${t('clueLabel')}</label>
@@ -3280,7 +3337,7 @@ function goBackPage(){ if(navIdx>0 && history.state && history.state.ito) histor
    unlike a classic script — so anything referenced from onclick="..." in
    the templates above must be explicitly exported here.) */
 Object.assign(window, {
-  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, closeEvent, localBatsuStart, localBatsuVote, localBatsuShow, localBatsuBack, hostBatsuStart, batsuVote, hostBatsuShow, hostBatsuBack, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
+  setLang, goBank, goHelp, goPledge, logoTap, goBackPage, toggleLocalNumber, toggleOnlineNumber, toggleOnlineNumber, pickAvatar, setRespondMode, setTimerSecs, localPeekDone, localAfterThink, localStartWrite, hostStartTimer, hostEndGame, localEndGame, closeEvent, localBatsuStart, localBatsuVote, localBatsuShow, localBatsuBack, hostBatsuStart, batsuVote, hostBatsuShow, hostBatsuBack, localShuffleTopic, hostShuffleTopic, requestHome, toggleMusic, toggleMusicPanel, setMusicVolume, closeLeaveConfirm, confirmLeave, bankAddTopic, communityShuffle, presetShuffle, toggleSound,
   beginLocalRound, copyCode, createRoomAction, goLocalSetup, goOnlineHome, goTitle,
   hostStartRound, joinRoomAction, localRevealOwnNumber, localSubmitClue, render,
   retrySync, setLocalCount, startLocalGame, submitClueAction, toggleHelp,
