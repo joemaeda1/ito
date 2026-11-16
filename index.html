@@ -863,6 +863,60 @@
       transform:translate3d(-140%,0,0) skewX(-18deg);animation:goldSweep 5.5s var(--ease-in-out) infinite;animation-delay:var(--sd,0s);}
     @keyframes goldSweep{0%{transform:translate3d(-140%,0,0) skewX(-18deg);}22%,100%{transform:translate3d(320%,0,0) skewX(-18deg);}}
   }
+
+  /* ---------- v34: the table and the cards (drag to reorder, deal-in, flip theater, card material) ---------- */
+  /* language pill: same look, full 44 px tap height */
+  .lang-mini{padding:0;gap:0;}
+  .lang-mini button{height:44px;min-width:50px;border:3px solid transparent;background-clip:padding-box;}
+  .lang-mini button + button{margin-left:-4px;}
+  /* material: cream paper with a fine grain, a lit top edge and an inner hairline border */
+  .order-card.deal{background-color:var(--card);background-image:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 46%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .26 0 0 0 0 .12 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    border-color:rgba(228,215,190,.95);
+    box-shadow:0 16px 28px -18px rgba(0,0,0,.62),0 3px 6px -3px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.85);}
+  .thread-wrap .order-card.deal::before{content:"";display:block;position:absolute;left:4px;top:4px;right:4px;bottom:4px;width:auto;height:auto;border-radius:20px;border:1px solid rgba(170,140,90,.24);background:none;box-shadow:none;pointer-events:none;}
+  .tok:not(.tok-next){background:radial-gradient(circle at 36% 26%,#FFFEF8 0%,#FBF2DE 58%,#EFE1C2 100%);
+    box-shadow:inset 0 0 0 3px var(--c),inset 0 0 0 5px #FFF8EC,inset 0 0 0 6px rgba(0,0,0,.09),inset 0 -4px 6px -1px rgba(110,78,30,.22),0 1px 0 rgba(255,255,255,.75),0 5px 10px -6px rgba(0,0,0,.55);
+    text-shadow:0 1px 0 rgba(255,255,255,.95),0 -1px 0 rgba(70,48,14,.22);}
+  /* drag to reorder */
+  .order-card.movable{cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  .order-card.movable .order-controls button{cursor:pointer;}
+  .thread-wrap.sorting .order-card{transform:translate3d(0,var(--dy,0px),0) rotate(var(--tilt,0deg));transition:transform var(--dur-fast) var(--ease-out);}
+  .thread-wrap.sorting .order-card.dragging{animation:none;position:relative;z-index:5;cursor:grabbing;scale:1.035;rotate:1.6deg;
+    transition:scale var(--dur-fast) var(--ease-spring),rotate var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
+    box-shadow:0 34px 44px -18px rgba(0,0,0,.7),0 10px 16px -8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.85);}
+  @media (prefers-reduced-motion:reduce){ .thread-wrap.sorting .order-card{transition:none;} .thread-wrap.sorting .order-card.dragging{scale:1;rotate:0deg;transition:none;} }
+  /* deal-in: a small deck at the top hands the cards out one by one */
+  .deal-deck{display:none;}
+  .oc-sheen{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;}
+  .oc-sheen i{position:absolute;top:-20%;bottom:-20%;left:0;width:30%;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.8),rgba(255,255,255,0));}
+  @media (prefers-reduced-motion:no-preference){
+    .thread-wrap.dealing .order-card{animation:cardDealIn .46s var(--ease-out) calc(var(--di,0) * 80ms + var(--dt,0ms)) backwards,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .thread-wrap.dealing .order-card.tap-next{animation:cardDealIn .46s var(--ease-out) calc(var(--di,0) * 80ms + var(--dt,0ms)) backwards,pulsecard 1.4s ease-in-out infinite,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .thread-wrap.dealing .deal-deck{display:block;position:absolute;left:50%;top:-58px;width:132px;height:30px;margin-left:-66px;pointer-events:none;z-index:3;
+      animation:deckLife calc(var(--dn,4) * 80ms + 560ms) linear var(--dt,0ms) both;}
+    .deal-deck i{position:absolute;inset:0;border-radius:12px;background:linear-gradient(160deg,#323d4a,#232c37);box-shadow:0 6px 10px -6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.14);}
+    .deal-deck i:nth-child(2){transform:translate3d(0,-4px,0) rotate(-2deg);}
+    .deal-deck i:nth-child(3){transform:translate3d(0,-8px,0) rotate(1.5deg);}
+    @keyframes cardDealIn{0%{opacity:0;transform:translate3d(0,calc(var(--di,0) * -78px - 62px),0) rotate(-7deg) scale(.42);}35%{opacity:1;}82%{transform:translate3d(0,3px,0) rotate(var(--tilt,0deg)) scale(1);}100%{opacity:1;transform:rotate(var(--tilt,0deg));}}
+    @keyframes deckLife{0%{opacity:0;transform:scale(.8);}10%{opacity:1;transform:scale(1);}82%{opacity:1;transform:scale(1);}100%{opacity:0;transform:translate3d(0,-8px,0) scale(.9);}}
+    /* flip theater: lift, turn in 3D, light crosses the face, settle */
+    .order-card.flipcard{animation:cardTurn .85s linear both,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.flipcard::after{animation:turnBack .85s linear both;}
+    .order-card.flipcard.bounce{animation:cardTurn .85s linear both,cardBounce .6s var(--ease-spring) .85s 1,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.flipcard.shake{animation:cardTurn .85s linear both,cardShake .55s ease-in-out .85s 1,floatY var(--fp,6s) ease-in-out var(--fd,0s) infinite;}
+    .order-card.flipcard .oc-sheen i{animation:sheenPass .5s var(--ease-in-out) .44s both;}
+    .order-card.flipcard .bead.has-av .av-eyes{animation:eyeGlance .95s ease-in-out .3s both;}
+    @keyframes cardTurn{
+      0%{transform:perspective(900px) rotate(var(--tilt,0deg)) rotateY(180deg) scale(1);animation-timing-function:var(--ease-out);}
+      22%{transform:perspective(900px) rotate(var(--tilt,0deg)) translate3d(0,-7px,0) rotateY(180deg) scale(1.06);animation-timing-function:var(--ease-in);}
+      45%{transform:perspective(900px) rotate(var(--tilt,0deg)) translate3d(0,-7px,0) rotateY(90deg) scale(1.06);animation-timing-function:var(--ease-out);}
+      68%{transform:perspective(900px) rotate(var(--tilt,0deg)) translate3d(0,-7px,0) rotateY(0deg) scale(1.06);animation-timing-function:var(--ease-spring);}
+      100%{transform:perspective(900px) rotate(var(--tilt,0deg)) rotateY(0deg) scale(1);}
+    }
+    @keyframes turnBack{0%,44.9%{opacity:1;}45%,100%{opacity:0;}}
+    @keyframes sheenPass{0%{opacity:1;transform:translate3d(-150%,0,0) skewX(-18deg);}100%{opacity:1;transform:translate3d(480%,0,0) skewX(-18deg);}}
+    @keyframes eyeGlance{0%,100%{translate:0 0;}35%,75%{translate:1.1px .35px;}}
+  }
 </style>
 </head>
 <body>
@@ -1590,7 +1644,7 @@ function audioOut(ctx, bus){
 // Haptics (Android; iPhone browsers have no vibration). Follows its own switch in the music panel.
 let hapticsEnabled=true;
 try{ if(localStorage.getItem('ito_haptics')==='0') hapticsEnabled=false; }catch(e){}
-const HAPTIC={flip:12, miss:[28,45,28], life:[55,60,90], perfect:[14,50,14,50,36], on:24};
+const HAPTIC={flip:12, miss:[28,45,28], life:[55,60,90], perfect:[14,50,14,50,36], on:24, lift:14, slot:6, drop:18};
 function canVibrate(){ return typeof navigator!=='undefined' && typeof navigator.vibrate==='function'; }
 function buzz(pattern){ if(!hapticsEnabled || !canVibrate()) return false; try{ return navigator.vibrate(pattern)!==false; }catch(e){ return false; } }
 function refreshHapticsSwitch(){
@@ -1645,8 +1699,10 @@ const SFX={
   jingle(at){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>playTone(f,(at||0)+i*0.11,0.3,'sine',0.12)); },
   falling(at){ [392,329.63,261.63].forEach((f,i)=>playTone(f,(at||0)+i*0.32,0.5,'triangle',0.11)); },
   ding(){ playTone(1318.5,0,0.35,'sine',0.08); },
+  drop(){ playTone(140,0,0.14,'sine',0.11); noiseBurst(0.05,900,400,0.035); },   // a card set down on the table
   swish(){ noiseBurst(0.16, 1800, 700, 0.06); },
 };
+function dealSound(n){ for(let i=0;i<n;i++) noiseBurst(0.07, 2600, 1100, 0.04, 0.05+i*0.08); }   // one soft flick per card
 // Game over: the music steps away for a moment.
 let musicDuckUntil=0;
 function duckMusic(ms){ musicDuckUntil=Date.now()+ms; updateMusicMood(); setTimeout(updateMusicMood, ms+50); }
@@ -2762,7 +2818,10 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
     html += `<div class="reveal-progress">${revealProgressText(rev,n)}</div>`;
   }
   if(!done) html += `<div class="order-anchor order-anchor-top"><span class="anchor-label"><span class="anc-badge">${icon('arrow-up')}</span>${t('orderHighLabel')}</span></div>`;
-  html += `<div class="thread-wrap${done?((success||!over)?' win':' lose'):''}${done&&(success||!over)?fx(lkey+':wave','wave',2600):''}">`;
+  // Deal-in: the first time this round's table shows, cards fly in from a small deck. Clock-phased so a redraw carries on.
+  const dealK='dealin:'+lkey, dealFirst=!fxSeen.has(dealK), dealing=(phase==='order' && !reduceMotion()) ? fx(dealK,'dealing',n*80+760) : '';
+  if(dealing && dealFirst) dealSound(n);
+  html += `<div class="thread-wrap${done?((success||!over)?' win':' lose'):''}${done&&(success||!over)?fx(lkey+':wave','wave',2600):''}${dealing}"${dealing?` style="--dn:${n};--dt:${-(Date.now()-fxSeen.get(dealK))}ms"`:''}>`;
   for(let idx=n-1; idx>=0; idx--){         // top of the screen is the highest spot (the array runs lowest to highest)
     const id=order[idx], p=playersObj[id], shown=idx<rev, isNext=(idx===rev && !done && hostAllowed), canMove=!done && idx>=rev;
     let link='', cardFx='';
@@ -2771,8 +2830,8 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
       link='';
     }
     if(idx===rev-1){
-      cardFx = fx(fxk+':flip','flipcard',900);
-      if(idx>0) cardFx += fx(fxk+':card', (playersObj[order[idx-1]].number < p.number)?'bounce':'shake', 1400);
+      cardFx = fx(fxk+':flip','flipcard',950);
+      if(idx>0) cardFx += fx(fxk+':card', (playersObj[order[idx-1]].number < p.number)?'bounce':'shake', 1650);
     }
     const tok = shown
       ? `<span class="tok" style="--c:${playerColor(id,playersObj)}">${p.number}</span>`
@@ -2782,17 +2841,17 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
         <button aria-label="${esc(t('moveDownLabel'))}" onclick="${cb.move}(${idx},-1)" ${idx===rev?'disabled':''}>${icon('chev-down')}</button>
       </div>` : '';
     const breaker = done && idx>0 && p.number < playersObj[order[idx-1]].number;
-    html += `<div class="order-card deal${shown?' static':''}${isNext?' tap-next':''}${cardFx}" data-id="${esc(id)}" style="--wi:${idx};--tilt:${idx%2?1.4:-1.4}deg;${floatStyle(idx).replace(/^ style="|"$/g,'')}"><div class="oc-row">
+    html += `<div class="order-card deal${shown?' static':''}${isNext?' tap-next':''}${canMove?' movable':''}${cardFx}" data-id="${esc(id)}" style="--wi:${idx};--di:${n-1-idx};--tilt:${idx%2?1.4:-1.4}deg;${floatStyle(idx).replace(/^ style="|"$/g,'')}"><div class="oc-row">
         ${beadHTML(id,playersObj,'oc-av'+(breaker?' breaker'+fx(lkey+':dizzy:'+id,' dizzy',2000):''))}
         <div class="oc-main"><div class="ocname">${esc(p.name)}</div>${p.clue?`<div class="occlue">${esc(p.clue)}</div>`:''}</div>
         ${tok}${ctr}
-      </div>${link}</div>`;
+      </div>${cardFx.includes('flipcard')?'<span class="oc-sheen" aria-hidden="true"><i></i></span>':''}${link}</div>`;
     if(idx>0 && idx<rev){
       const ok = playersObj[order[idx-1]].number < p.number;
       if(!ok) html += `<span class="sr-only">${esc(t('connectorBadText'))}</span>`;
     }
   }
-  html += `</div>`;
+  html += `${dealing?'<div class="deal-deck" aria-hidden="true"><i></i><i></i><i></i></div>':''}</div>`;
   if(!done) html += `<div class="order-anchor order-anchor-bottom"><span class="anchor-label"><span class="anc-badge">${icon('arrow-down')}</span>${t('orderLowLabel')}</span></div>`;
   if(!done && over && rev<n){
     if(hostAllowed) html += `<button class="btn btn-primary" onclick="${cb.revealNext}()">${t('finishFlipBtn')}</button><button class="btn btn-secondary" style="margin-top:8px;" onclick="${cb.endGame}()">${t('endGameBtn')}</button>`;
@@ -2810,7 +2869,99 @@ function renderOrderAndReveal(playersObj, order, topic, phase, round, history, h
   return html;
 }
 
+/* ---------- drag to reorder (touch: hold to lift so a swipe still scrolls; mouse: just drag). Arrows stay for accessibility. ---------- */
+const DRAG_HOLD_MS=170, DRAG_SLOP_TOUCH=9, DRAG_SLOP_MOUSE=5;
+let drag=null, dragEndedAt=0;
+function applyOrder(o){
+  if(mode==='local' && local){ local.order=o; slideRender(); }
+  else if(room){ room.order=o; slideRender(); safeWrite(()=>update(roomRef(room.code), {order:o})); }
+}
+function dragStart(e){
+  if(drag || (e.button!=null && e.button>0) || !e.target.closest) return;
+  const card=e.target.closest('.thread-wrap .order-card.movable'); if(!card || e.target.closest('button')) return;
+  const touch=(e.pointerType==='touch' || e.pointerType==='pen');
+  drag={el:card, pid:e.pointerId, x0:e.clientX, y0:e.clientY, py0:e.clientY+window.scrollY, cy:e.clientY, lifted:false, touch};
+  if(touch) drag.timer=setTimeout(()=>{ if(drag && !drag.lifted) dragLift(); }, DRAG_HOLD_MS);
+}
+function dragLift(){
+  const d=drag, wrap=d.el.parentNode, cards=wrap?[...wrap.querySelectorAll('.order-card.movable')]:[], a=cards.indexOf(d.el);
+  if(a<0 || cards.length<2){ dragCancel(); return; }
+  const sy=window.scrollY, last=cards.length-1;
+  d.cards=cards; d.a=a; d.b=a; d.wrap=wrap;
+  d.rects=cards.map(c=>{ const r=c.getBoundingClientRect(); return {top:r.top+sy, h:r.height, mid:r.top+sy+r.height/2}; });
+  d.pitch=d.rects[a].h+(parseFloat(getComputedStyle(d.el).marginBottom)||0);
+  d.min=d.rects[0].top-d.rects[a].top-8; d.max=(d.rects[last].top+d.rects[last].h)-(d.rects[a].top+d.rects[a].h)+8;
+  d.lifted=true; wrap.classList.add('sorting'); d.el.classList.add('dragging');
+  try{ d.el.setPointerCapture(d.pid); }catch(err){}
+  buzz(HAPTIC.lift); SFX.swish();
+  dragMove(); if(typeof requestAnimationFrame==='function') d.raf=requestAnimationFrame(dragLoop);
+}
+function dragMove(){
+  const d=drag; if(!d || !d.lifted) return;
+  const dy=Math.max(d.min, Math.min(d.max, d.cy+window.scrollY-d.py0)), top=d.rects[d.a].top+dy, bot=top+d.rects[d.a].h;
+  d.el.style.setProperty('--dy', dy.toFixed(1)+'px');
+  let b=d.a;
+  d.cards.forEach((c,i)=>{            // a neighbor steps aside once the dragged card's leading edge passes its middle
+    if(i===d.a) return; let sh=0;
+    if(i<d.a && top<d.rects[i].mid){ sh=d.pitch; b=Math.min(b,i); }
+    else if(i>d.a && bot>d.rects[i].mid){ sh=-d.pitch; b=Math.max(b,i); }
+    c.style.setProperty('--dy', sh+'px');
+  });
+  if(b!==d.b){ d.b=b; buzz(HAPTIC.slot); }
+}
+function dragLoop(){                  // near the top or bottom edge of the screen the page scrolls along
+  const d=drag; if(!d || !d.lifted) return;
+  const m=72, H=window.innerHeight; let v=0;
+  if(d.cy<m) v=-Math.ceil((m-d.cy)/5); else if(d.cy>H-m) v=Math.ceil((d.cy-(H-m))/5);
+  if(v){ window.scrollBy(0,v); dragMove(); }
+  d.raf=requestAnimationFrame(dragLoop);
+}
+function dragPointerMove(e){
+  const d=drag; if(!d || e.pointerId!==d.pid) return;
+  d.cy=e.clientY;
+  if(!d.lifted){
+    const dist=Math.hypot(e.clientX-d.x0, e.clientY-d.y0);
+    if(d.touch){ if(dist>DRAG_SLOP_TOUCH) dragCancel(); }      // a moving finger means scrolling
+    else if(dist>DRAG_SLOP_MOUSE) dragLift();
+    return;
+  }
+  if(e.cancelable) e.preventDefault();
+  dragMove();
+}
+function dragClear(d){
+  clearTimeout(d.timer); if(d.raf && typeof cancelAnimationFrame==='function') cancelAnimationFrame(d.raf);
+  try{ if(d.el.releasePointerCapture) d.el.releasePointerCapture(d.pid); }catch(err){}
+}
+function dragCancel(){               // also called by render(): a redraw replaces the cards, so the drag lets go
+  const d=drag; if(!d) return; drag=null; dragClear(d);
+  if(d.lifted){ (d.cards||[]).forEach(c=>c.style.removeProperty('--dy')); d.el.classList.remove('dragging'); if(d.wrap) d.wrap.classList.remove('sorting'); }
+}
+function dragEnd(e){
+  const d=drag; if(!d || (e && e.pointerId!=null && e.pointerId!==d.pid)) return;
+  if(!d.lifted || (e && e.type==='pointercancel')){ dragCancel(); return; }
+  drag=null; dragClear(d); dragEndedAt=Date.now();
+  const cur=(mode==='local' && local) ? (local.order||[]) : (room ? (room.order||[]) : []);
+  const ids=d.cards.map(c=>c.dataset.id), locked=cur.slice(0, cur.length-ids.length);
+  const same=ids.length<=cur.length && ids.every(id=>cur.indexOf(id)>=locked.length);
+  if(d.b===d.a || !same){            // put back where it was: glide home, then tidy up
+    d.el.classList.remove('dragging'); d.cards.forEach(c=>c.style.setProperty('--dy','0px'));
+    setTimeout(()=>{ if(d.wrap && !drag){ d.wrap.classList.remove('sorting'); d.cards.forEach(c=>c.style.removeProperty('--dy')); } }, 180);
+    return;
+  }
+  const id=ids[d.a]; ids.splice(d.b, 0, ids.splice(d.a,1)[0]);
+  applyOrder(locked.concat(ids.reverse()));      // the screen shows High on top; the stored order runs low to high
+  SFX.drop(); buzz(HAPTIC.drop);
+  const el=[...document.querySelectorAll('.order-card[data-id]')].find(c=>c.dataset.id===id);
+  if(el && !reduceMotion() && typeof el.animate==='function') el.animate([{scale:'1.035'},{scale:'1'}],{duration:260, easing:EASE.spring});
+}
+document.addEventListener('pointerdown', dragStart);
+document.addEventListener('pointermove', dragPointerMove, {passive:false});
+document.addEventListener('pointerup', dragEnd);
+document.addEventListener('pointercancel', dragEnd);
+document.addEventListener('touchmove', e=>{ if(drag && drag.lifted && e.cancelable) e.preventDefault(); }, {passive:false});   // a lifted card must not scroll the page
+document.addEventListener('contextmenu', e=>{ if(drag) e.preventDefault(); });
 document.addEventListener('click',e=>{
+  if(Date.now()-dragEndedAt<400) return;      // letting go of a dragged card is not a tap
   const card=e.target.closest && e.target.closest('.order-card.tap-next'); if(!card || e.target.closest('button')) return;
   const b=card.querySelector('.tok-next'); if(b) b.click();
 });
@@ -2941,6 +3092,7 @@ function timerFrame(){
 /* ---------- top-level render ---------- */
 function render(){
   const app=document.getElementById('app');
+  if(drag) dragCancel();
   snapshotInputs();
   const prevPageKey=lastPageKey;
   syncHistory();
